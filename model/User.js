@@ -12,11 +12,7 @@ const userSchema = new Schema({
         required: true
 
     },
-    middlename: {
-        type: String,
-        required: true
-
-    },
+    middlename: String,
     password: {
         type: String,
         required: true
@@ -28,11 +24,11 @@ const userSchema = new Schema({
     },
     refreshToken: String,
     roles: {
-        Admin: {
+        Teacher: {
             type: Number,
-            default: 2000
+            default: 1984        
         },
-        SuperAdmin: Number
+        Admin: Number
     }
 });
 

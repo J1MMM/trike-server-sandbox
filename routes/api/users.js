@@ -1,16 +1,16 @@
 const express = require('express');
 const verifyRoles = require('../../middleware/verifyRoles');
 const ROLES_LIST = require('../../config/roles_list');
-const { getAllUsers, updateUser, deleteUser, createUser } = require('../../controllers/usersController');
+const { getAllUsers, updateUser, deleteUser, createUser, getUser } = require('../../controllers/usersController');
 const router = express.Router()
 
 router.route('/')
-    .get(verifyRoles(ROLES_LIST.SuperAdmin), getAllUsers)
-    .post(verifyRoles(ROLES_LIST.SuperAdmin), createUser)
-    .put(verifyRoles(ROLES_LIST.SuperAdmin), updateUser)
-    .delete(verifyRoles(ROLES_LIST.SuperAdmin), deleteUser)
+    .get(verifyRoles(ROLES_LIST.Admin), getAllUsers)
+    .post(verifyRoles(ROLES_LIST.Admin), createUser)
+    .put(verifyRoles(ROLES_LIST.Admin), updateUser)
+    .delete(verifyRoles(ROLES_LIST.Admin), deleteUser)
 
-// router.route('/:id')
-//     .get(getEmployee)
+router.route('/:id')
+    .get(getUser)
 
 module.exports = router

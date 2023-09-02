@@ -32,3 +32,37 @@
 2023/08/09	20:30:02	ca2fee8e-3d55-47d2-bd55-edd062509389	Error: Not allowed by CORS
 2023/08/09	20:30:17	ea028911-3403-4e10-a2b5-2961afb498a2	Error: Not allowed by CORS
 2023/08/09	20:30:17	efb01016-c832-44c4-b6aa-97f1b3d07821	Error: Not allowed by CORS
+2023/08/11	08:57:39	53674824-5cd8-4cfc-a49b-213c290adc29	Error: Not allowed by CORS
+2023/08/11	09:03:29	7415b6f7-d1d7-473b-9d7b-dda1836e75a3	Error: Not allowed by CORS
+2023/08/11	09:03:29	fd19b9b6-dba6-4aa6-a725-d95e9b5da01e	Error: Not allowed by CORS
+2023/08/11	09:13:04	12f8ba09-45c0-4f93-b5cf-a03897345926	Error: Not allowed by CORS
+2023/08/11	09:13:04	3f17b8b5-5b80-4bcb-8fe9-6cfcc9cfaf43	Error: Not allowed by CORS
+2023/08/11	09:13:54	6a772609-71ec-45c4-a67a-b20b2ba96c1b	Error: Not allowed by CORS
+2023/08/11	09:13:54	7ce977f3-df1d-49ac-926d-3f9e27e2086c	Error: Not allowed by CORS
+2023/08/11	20:38:36	7cd1acdc-943d-49ae-b3a8-6df293a2ca0f	Error: Not allowed by CORS
+2023/08/11	20:38:50	0a0633bc-f63f-4f11-8aa5-cc126e1e3a81	Error: Not allowed by CORS
+2023/08/26	06:44:30	78d77333-b58e-44dd-878c-ae5ed2f07c7d	TypeError: Cannot destructure property 'originalname' of 'req.file' as it is undefined.
+2023/08/26	06:55:13	07fb6ff4-9e5c-4a48-8b30-14695eaad043	TypeError: Cannot destructure property 'originalname' of 'req.file' as it is undefined.
+2023/08/26	07:18:10	729de52b-1414-4ce8-a501-8c3fb0f7840f	PayloadTooLargeError: request entity too large
+2023/08/26	07:18:16	444482d9-9a89-4755-b6af-472507956c0e	PayloadTooLargeError: request entity too large
+2023/08/28	06:39:46	88a2848b-5962-4d6a-b50e-2d159a29f1a2	Error: ENOENT: no such file or directory, open 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\DEDSEC_PROJECT_PROPOSAL.pdf'
+2023/08/28	06:39:51	b2322f61-b261-4b7b-bf69-a907073a02fd	Error: ENOENT: no such file or directory, open 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\DEDSEC_PROJECT_PROPOSAL.pdf'
+2023/08/28	06:39:56	d3ceb9e8-3ccc-401c-969e-1dc14e12b302	Error: ENOENT: no such file or directory, open 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\DEDSEC_PROJECT_PROPOSAL.pdf'
+2023/08/28	07:38:54	ab298bb6-20f2-4cdc-8823-c89e89c0fc8f	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693178059739_DEDSEC_PROJECT_PReOPOSAL.pdf'
+2023/08/28	08:32:25	84f28de7-f9b6-4a1b-a73c-fa7b2954ee3a	TypeError: Cannot read properties of undefined (reading 'originalname')
+2023/08/28	08:32:30	1ad1bbb6-2d6b-4973-a893-90bf2eb3d993	TypeError: Cannot read properties of undefined (reading 'originalname')
+2023/08/28	08:32:44	66d39d2b-0a27-46a8-ac85-9ae2fea30b2a	TypeError: Cannot read properties of undefined (reading 'originalname')
+2023/08/30	21:10:48	505485bc-bea4-4f6d-b0cb-5632eb88d31d	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693379531412_math-q1w5-6(k).pptm'
+2023/08/30	21:11:31	b22aa9b5-8300-4809-8040-450944e79780	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693379531412_math-q1w5-6(k).pptm'
+2023/08/30	21:11:43	fe55d26d-8343-40c1-b0e4-2671ba2094cb	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693379531412_math-q1w5-6(k).pptm'
+2023/08/30	21:13:41	49a3ffb8-6936-449d-93bf-7713df1cd934	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693379531412_math-q1w5-6(k).pptm'
+2023/08/30	21:14:22	73bb68ff-a772-4f6b-8675-7cb479b5ec8a	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693379531412_math-q1w5-6(k).pptm'
+2023/08/30	21:16:50	8cc137ea-2bb3-4abf-a190-0f3e3b3475c3	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693379531412_math-q1w5-6(k).pptm'
+2023/08/30	21:16:59	8c90cf43-a36e-4da3-8a57-b5590e98c425	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693379531412_math-q1w5-6(k).pptm'
+2023/09/02	13:42:41	9e92e374-5ac4-4b32-85fb-9e8ba5d77edc	Error: Not allowed by CORS
+2023/09/02	13:42:41	dcbc74fd-5bc0-49f1-b7cb-29fd0445ff59	Error: Not allowed by CORS
+2023/09/02	13:42:47	8a081264-ccc0-45c1-9c2b-61c921ae7977	Error: Not allowed by CORS
+2023/09/02	13:43:29	9cd98fb0-6305-430d-825d-258bfb54872f	Error: Not allowed by CORS
+2023/09/02	13:43:35	d30580ef-fb89-4eee-9e4c-4d2521d18ca9	Error: Not allowed by CORS
+2023/09/02	13:43:35	6cf03906-a0bd-4dda-ad45-7957896e05fb	Error: Not allowed by CORS
+2023/09/02	13:59:27	ced0bef8-74a9-4520-aeea-27a3f16d322d	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693634006379_Cover-Note-PY-2023-2024 (2).pdf'

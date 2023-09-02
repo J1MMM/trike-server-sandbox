@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../model/User');
 
 const getAllUsers = async (req, res) => {
+    console.log(req.headers)
     try {
         const result = await User.find();
         if (!result) return res.status(204).json({ "message": "No students found" })
@@ -13,10 +14,10 @@ const getAllUsers = async (req, res) => {
 
 const createUser = async (req, res) => {
     const { email, password, firstname, lastname, middlename } = req.body;
-    if (!email || !password || !firstname || !lastname || !middlename) return res.status(400).json({ "message": "All fields are required" })
+    if (!email || !password || !firstname || !lastname) return res.status(400).json({ "message": "All fields are required" })
 
     const duplicate = await User.findOne({ email: email }).exec();
-    if (duplicate) return res.sendStatus(409); //confilict
+    if (duplicate) return res.status(409).json({"message": 'This Email Address is Already in use'}); //confilict
 
     try {
         const hashedPwd = await bcrypt.hash(password, 10);
@@ -29,7 +30,7 @@ const createUser = async (req, res) => {
             "middlename": middlename
         })
         console.log(result);
-        res.status(201).json({ "success": `New User ${email} Created` })
+        res.status(201).json({ "success": `New user ${firstname} has been created successfully!`, result })
 
     } catch (error) {
         res.status(400).json({ "message": error.message })
@@ -41,29 +42,56 @@ const updateUser = async (req, res) => {
 
     try {
         const user = await User.findOne({ _id: req.body.id }).exec();
+        let pwdMatch = false;
 
-        if (req.body.firstname) user.firstname = req.body.firstname
-        if (req.body.lastname) user.lastname = req.body.lastname
-        if (req.body.middlename) user.middlename = req.body.middlename
-        if (req.body.email) user.email = req.body.email
-        if (req.body.password) user.password = req.body.password
+        if(req?.body?.password){
+            pwdMatch = await bcrypt.compare(req.body.password, user.password)
+        }else{
+            pwdMatch = true
+        }
+
+
+        if(user.firstname == req?.body?.firstname && user.lastname == req?.body?.lastname && user.middlename == req?.body?.middlename && user.email == req?.body?.email && pwdMatch) return res.status(304).json({"message": `No changes for user with ID: ${user._id}`})
+
+        if (req?.body?.firstname) user.firstname = req.body.firstname
+        if (req?.body?.lastname) user.lastname = req.body.lastname
+        if (req?.body?.middlename) user.middlename = req.body.middlename; 
+        if(req?.body?.middlename?.trim() === ""){
+            user.middlename = "";
+        }
+        if (req?.body?.email) user.email = req.body.email
+        if (req?.body?.password) user.password = await bcrypt.hash(req.body.password, 10);
 
         const result = await user.save();
-        res.json(result)
+        res.json({"success": "User updated successfully!", result})
     } catch (error) {
+        console.log(error)
         res.status(400).json({ "message": error.message })
     }
 }
 
 const deleteUser = async (req, res) => {
-    const { id } = req.body
+    const { id } = req.body;
     if (!id) return res.sendStatus(400)
 
     try {
         await User.findByIdAndDelete(id)
-        res.status(204).json({ 'message': `Student with ID: ${id} was deleted` })
+        res.status(204).json({ 'message': `User with ID: ${id} was deleted` })
     } catch (error) {
         res.status(400).json({ 'message': error.message })
+    }
+}
+
+const getUser = async(req, res) => {
+    const {id} = req.params;
+    if(!id) return res.sendStatus(400);
+
+    try{
+        const user = await User.findOne({_id: id});
+        if(!user) return res.sendStatus(204);
+        res.json(user)
+    }catch(err){
+        console.error(err)
     }
 }
 
@@ -71,5 +99,6 @@ module.exports = {
     getAllUsers,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUser
 }

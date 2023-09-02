@@ -1,6 +1,7 @@
 const ROLES_LIST ={
-    SuperAdmin: 3000,
-    Admin: 2000,
+    Admin: 5150,
+    Teacher: 1984
+
 }
 
 module.exports = ROLES_LIST

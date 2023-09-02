@@ -4,6 +4,8 @@ const User = require('../model/User');
 
 const handleLogin = async (req, res) => {
     const { email, pwd } = req.body;
+    console.log(email)
+    console.log(pwd)
     if (!email || !pwd) return res.status(400).json({ "message": "Email and Password are required" })
 
     const foundUser = await User.findOne({ email }).exec();
@@ -11,18 +13,22 @@ const handleLogin = async (req, res) => {
 
     const match = await bcrypt.compare(pwd, foundUser.password);
     if (!match) return res.status(401).json({ 'message': `Incorrect email or password` })
-
     try {
-        const roles = Object.values(foundUser.roles)
+        const roles = Object.values(foundUser.roles).filter(Boolean)
+        const fullname = `${foundUser.firstname} ${foundUser.lastname}`
+        const id = foundUser._id;
+
         const accessToken = jwt.sign(
             {
                 "UserInfo": {
+                    "id": id,
                     "email": foundUser.email,
-                    "roles": roles
+                    "roles": roles,
+                    "fullname": fullname
                 }
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '1d' }
         )
 
         const refreshToken = jwt.sign(
@@ -34,8 +40,8 @@ const handleLogin = async (req, res) => {
         foundUser.refreshToken = refreshToken
         const result = await foundUser.save()
         //response
-        res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, sameSite: 'None' }) //secure: true
-        res.json({ accessToken })
+        res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, sameSite: 'None', secure: true }) //secure: true
+        res.json({ roles, accessToken, fullname})
     } catch (error) {
         res.status(400).json({ "message": error.message })
     }

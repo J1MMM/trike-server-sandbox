@@ -22,6 +22,27 @@ const studentSchema = new Schema({
     type: String,
     require: true
   },
+  teacherID: {
+    type: String,
+    require: true
+  },
+  learning_disabilities: [
+    {
+      type: String,
+      enum: ["dyslexia", "dysgraphia", "dyscalculia"],
+      require: true
+    }
+  ],
+  instructor: {
+    type: String,
+    require: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    require: true
+  }
+
 });
 
 module.exports = mongoose.model('Student', studentSchema)

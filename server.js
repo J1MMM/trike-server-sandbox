@@ -11,7 +11,21 @@ const { logger, logEvents } = require("./middleware/logEvents");
 const verifyJWT = require('./middleware/verifyJWT');
 const cookieParser = require('cookie-parser');
 const credentials = require('./middleware/credentials');
+const multer = require('multer');
 const PORT = process.env.PORT || 3500;
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        return cb(null, "./uploads/lessons")
+    },
+    filename: function (req, file, cb) {
+        const filename = `${Date.now()}_${file.originalname}`;
+        req.filename = filename
+        return cb(null, filename)
+    }
+})
+
+const upload = multer({ storage })
 
 // connect to mongooDB 
 connectDB();
@@ -33,10 +47,15 @@ app.use('/', require('./routes/root'))
 app.use('/auth', require('./routes/api/auth'))
 app.use('/refresh', require('./routes/api/refresh'))
 app.use('/logout', require('./routes/api/logout'))
+app.use('/view', require('./routes/api/view'))
+
 // protected routes 
 app.use(verifyJWT)
 app.use('/students', require('./routes/api/students'))
 app.use('/users', require('./routes/api/users'))
+app.use('/upload', upload.single('file'), require('./routes/api/upload'));
+app.use('/download', require('./routes/api/download'));
+
 // 404 
 app.all('*', (req, res) => {
     res.status(404)
