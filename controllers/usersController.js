@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt');
 const User = require('../model/User');
 
 const getAllUsers = async (req, res) => {
-    console.log(req.headers)
     try {
         const result = await User.find();
         if (!result) return res.status(204).json({ "message": "No students found" })
@@ -29,7 +28,6 @@ const createUser = async (req, res) => {
             "lastname": lastname,
             "middlename": middlename
         })
-        console.log(result);
         res.status(201).json({ "success": `New user ${firstname} has been created successfully!`, result })
 
     } catch (error) {

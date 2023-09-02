@@ -30,9 +30,10 @@ const upload = multer({ storage })
 // connect to mongooDB 
 connectDB();
 // custom middleware 
-app.use(logger)
 app.use(credentials)
 app.use(cors(corsOption))
+app.use(logger)
+
 
 // middleware for form data
 app.use(express.urlencoded({ extended: false }));
