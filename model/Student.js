@@ -41,6 +41,10 @@ const studentSchema = new Schema({
     type: Date,
     default: Date.now,
     require: true
+  },
+  stars: {
+    type: Number,
+    default: 0
   }
 
 });

@@ -4,8 +4,6 @@ const User = require('../model/User');
 
 const handleLogin = async (req, res) => {
     const { email, pwd } = req.body;
-    console.log(email)
-    console.log(pwd)
     if (!email || !pwd) return res.status(400).json({ "message": "Email and Password are required" })
 
     const foundUser = await User.findOne({ email }).exec();
@@ -17,6 +15,7 @@ const handleLogin = async (req, res) => {
         const roles = Object.values(foundUser.roles).filter(Boolean)
         const fullname = `${foundUser.firstname} ${foundUser.lastname}`
         const id = foundUser._id;
+
 
         const accessToken = jwt.sign(
             {
@@ -30,6 +29,13 @@ const handleLogin = async (req, res) => {
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '1d' }
         )
+        
+        // if user allreafy login 
+        const rToken = foundUser.refreshToken;
+        if(rToken){
+            res.cookie('jwt', rToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, sameSite: 'None', secure: true }) //secure: true
+            return res.json({roles, accessToken, fullname})
+        }
 
         const refreshToken = jwt.sign(
             { "email": foundUser.email },
