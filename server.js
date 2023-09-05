@@ -13,19 +13,7 @@ const cookieParser = require('cookie-parser');
 const credentials = require('./middleware/credentials');
 const multer = require('multer');
 const PORT = process.env.PORT || 3500;
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        return cb(null, "./uploads/lessons")
-    },
-    filename: function (req, file, cb) {
-        const filename = `${Date.now()}_${file.originalname}`;
-        req.filename = filename
-        return cb(null, filename)
-    }
-})
-
-const upload = multer({ storage })
+const upload = multer({ storage: multer.memoryStorage() })
 
 // connect to mongooDB 
 connectDB();
@@ -33,7 +21,6 @@ connectDB();
 app.use(credentials)
 app.use(cors(corsOption))
 app.use(logger)
-
 
 // middleware for form data
 app.use(express.urlencoded({ extended: false }));

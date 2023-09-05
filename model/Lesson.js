@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const lessonSchema = new Schema({
     title: {
-     type: String,
+        type: String,
         required: true
     },
     instructor: {
@@ -17,7 +17,10 @@ const lessonSchema = new Schema({
     teacherID: {
         type: String,
         required: true
-
+    },
+    downloadURL: {
+        type: String,
+        required: true
     }
 });
 
