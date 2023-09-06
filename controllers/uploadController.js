@@ -2,7 +2,7 @@ const path = require('path')
 const Lesson = require('../model/Lesson')
 const ROLES_LIST = require('../config/roles_list')
 const fs = require('fs');
-const { ref, uploadBytesResumable, getDownloadURL, uploadBytes } = require('firebase/storage');
+const { ref, uploadBytesResumable, getDownloadURL, uploadBytes, deleteObject } = require('firebase/storage');
 const { storage } = require('../config/firebase.config');
 
 const getAllLessons = async (req, res) => {
@@ -28,15 +28,15 @@ const upload = async (req, res) => {
     const id = req.id;
     const fullname = req.fullname;
     const filename = req.file?.originalname;
-    console.log(req.file);
     if (!id || !filename || !title || !fullname) return res.sendStatus(400)
 
     const allowedExt = ['ppt', 'pptx', 'pptm', 'doc', 'docx', 'pdf', 'jpg', 'jpeg', 'png', 'txt']
     const fileExt = filename.split('.').pop().toLowerCase();
+    const filePath = `lessons/${Date.now()}_${filename}`;
     if (!allowedExt.includes(fileExt)) return res.status(401).json({ 'message': 'Invalid file format.' })
 
     try {
-        const storageRef = ref(storage, `lessons/${Date.now()}_${filename}`)
+        const storageRef = ref(storage, filePath)
         const metadata = {
             contentType: req.file.mimetype
         }
@@ -44,11 +44,13 @@ const upload = async (req, res) => {
         const downloadURL = await getDownloadURL(snapshot.ref)
 
         const result = await Lesson.create({
-            "filename": filename,
+            "fileName": filename,
             "teacherID": id,
             "title": title,
             "instructor": fullname,
-            "downloadURL": downloadURL
+            "uri": downloadURL,
+            "fileType": fileExt,
+            "filePath": filePath
         })
 
         res.status(200).json({ message: 'File uploaded successfully', result });
@@ -64,24 +66,32 @@ const editLesson = async (req, res) => {
     const { id, file } = req.body;
     if (!id) return res.sendStatus(400)
 
-
-
     try {
         const lesson = await Lesson.findOne({ _id: id }).exec();
+        if(!lesson) return res.status(404).json({"message": "File not Found"})
 
         if (req.file) {
-            const filename = lesson.filename
-
+            const fileName = req.file.originalname;
+            const filePath = lesson.filePath;
             const allowedExt = ['ppt', 'pptx', 'pptm', 'doc', 'docx', 'pdf', 'jpg', 'jpeg', 'png', 'txt']
-            const fileExt = filename.split('.').pop().toLowerCase();
+            const fileExt = fileName.split('.').pop().toLowerCase();
             if (!allowedExt.includes(fileExt)) return res.status(401).json({ 'message': 'Invalid file format.' })
+            // delete file from firebase 
+            const storageRef = ref(storage, filePath);
+            await deleteObject(storageRef);
+            // upload new file 
+            const newFilePath = `lessons/${Date.now()}_${fileName}`;
+            const newStorageRef = ref(storage, newFilePath)
+            const metadata = {
+                contentType: req.file.mimetype
+            }
+            const snapshot = await uploadBytesResumable(newStorageRef, req.file.buffer, metadata)
+            const downloadURL = await getDownloadURL(snapshot.ref)
 
-            const filePath = path.join(__dirname, '..', 'uploads', 'lessons', filename)
-            fs.unlink(filePath, (err) => {
-                if (err) {
-                    return res.status(500).send('Error updating file');
-                }
-            })
+            if(fileName) lesson.fileName = fileName;
+            if(newFilePath) lesson.filePath = newFilePath;
+            if(fileExt) lesson.fileType = fileExt;
+            if(downloadURL) lesson.uri = downloadURL;
         }
 
         if (req?.body?.title) lesson.title = req.body.title;
@@ -97,24 +107,22 @@ const editLesson = async (req, res) => {
 }
 
 const deleteLesson = async (req, res) => {
-    const { id, filename } = req.body;
-    if (!id || !filename) return res.status(400).json({ "message": "ID and Filename are required" });
+    const { id, filePath } = req.body;
+    if (!id || !filePath) return res.status(400).json({ "message": "ID and Filename are required" });
 
-    const filePath = path.join(__dirname, '..', 'uploads', 'lessons', filename)
     try {
         const result = await Lesson.findByIdAndDelete(id)
         if (!result) return res.status(201).json({ "message": 'File already deleted' });
+        
+        const storageRef = ref(storage, filePath);
+        await deleteObject(storageRef)
 
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                return res.status(500).send('Error deleting file');
-            }
-
-            res.status(204).json({ 'message': `Lesson deleted successfully` })
-        })
+        res.status(200).json({"message": "File deleted successfully"})
+        
     } catch (error) {
         res.status(400).json({ 'message': error.message })
     }
+
 }
 
 const viewFile = (req, res) => {

@@ -10,18 +10,27 @@ const lessonSchema = new Schema({
         type: String,
         required: true
     },
-    filename: {
-        type: String,
-        required: true
-    },
     teacherID: {
         type: String,
         required: true
     },
-    downloadURL: {
+    fileName: {
         type: String,
         required: true
-    }
+    },
+    uri: {
+        type: String,
+        required: true
+    },
+    fileType: {
+        type: String,
+        required: true
+    },
+    filePath: {
+        type: String,
+        required: true
+    },
+
 });
 
 module.exports = mongoose.model('Lesson', lessonSchema)
