@@ -133,7 +133,6 @@ const viewFile = async(req, res) => {
     try{
         console.log(id)
         const foundFile = await Lesson.findOne({ _id: id }).exec();
-        console.log(foundFile)
         if(!foundFile) return res.sendStatus(404);
 
         const filename = foundFile.fileName;
@@ -143,7 +142,7 @@ const viewFile = async(req, res) => {
         const response = await axios.get(uri, { responseType: 'stream' });
 
         // Send the downloaded file to the client
-        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+        res.setHeader(`attachment; filename=${filename}`);
         res.setHeader('Content-Type', response.headers['content-type']);
         response.data.pipe(res);
 
