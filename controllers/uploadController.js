@@ -129,9 +129,8 @@ const deleteLesson = async (req, res) => {
 const viewFile = async(req, res) => {
     const {id} = req.params;
     if(!id) return res.sendStatus(400);
-
+    
     try{
-        console.log(id)
         const foundFile = await Lesson.findOne({ _id: id }).exec();
         if(!foundFile) return res.sendStatus(404);
 
