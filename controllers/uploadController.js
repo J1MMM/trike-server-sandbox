@@ -142,7 +142,6 @@ const viewFile = async(req, res) => {
         const response = await axios.get(uri, { responseType: 'stream' });
 
         // Send the downloaded file to the client
-        res.setHeader(`attachment; filename=${filename}`);
         res.setHeader('Content-Type', response.headers['content-type']);
         response.data.pipe(res);
 

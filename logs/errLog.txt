@@ -25,3 +25,4 @@
 2023/09/07	08:41:31	21e13033-5ac5-4448-901e-59cdcf935de8	Error: Not allowed by CORS
 2023/09/07	08:41:33	42186458-48e1-46d0-9c80-5ae2858d27a5	Error: Not allowed by CORS
 2023/09/07	08:51:06	21f6a6e4-953b-4389-a737-e97aa1ce7895	Error: Not allowed by CORS
+2023/09/07	09:20:11	5d4dc447-b6bc-413f-a5b2-b1941a7cf00c	Error: Cannot set headers after they are sent to the client
