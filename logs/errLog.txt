@@ -18,3 +18,10 @@
 2023/09/06	06:52:17	c67c8eb2-52c9-46bc-949b-d7b73f2e3afc	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\banner9.jpg'
 2023/09/06	06:57:34	efbeb154-891c-4f7d-877b-f504c9434bf2	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\2nd'-sem.pdf'
 2023/09/06	06:57:34	e8b46f9c-49d0-403b-89ee-11ce63b92aa6	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\2nd'-sem.pdf'
+2023/09/07	08:32:43	97415d8c-fc74-47ba-bee0-e005c340c0b4	Error: Not allowed by CORS
+2023/09/07	08:33:17	b6c0abfc-a8d2-461f-89ea-5c168d0682bf	Error: Not allowed by CORS
+2023/09/07	08:38:01	02e35bde-214a-4db0-bac9-009787f1bf3b	Error: Not allowed by CORS
+2023/09/07	08:41:18	8301d1d0-3e36-4012-937f-89cd5153c421	Error: Not allowed by CORS
+2023/09/07	08:41:31	21e13033-5ac5-4448-901e-59cdcf935de8	Error: Not allowed by CORS
+2023/09/07	08:41:33	42186458-48e1-46d0-9c80-5ae2858d27a5	Error: Not allowed by CORS
+2023/09/07	08:51:06	21f6a6e4-953b-4389-a737-e97aa1ce7895	Error: Not allowed by CORS

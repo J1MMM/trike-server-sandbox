@@ -5,6 +5,6 @@ const ROLES_LIST = require('../../config/roles_list');
 const router = express.Router()
 
 	
-router.get('/:filename', viewFile)
+router.get('/:id', viewFile)
 
 module.exports = router

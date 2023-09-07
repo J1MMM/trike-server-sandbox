@@ -4,6 +4,7 @@ const ROLES_LIST = require('../config/roles_list')
 const fs = require('fs');
 const { ref, uploadBytesResumable, getDownloadURL, uploadBytes, deleteObject } = require('firebase/storage');
 const { storage } = require('../config/firebase.config');
+const axios = require('axios')
 
 const getAllLessons = async (req, res) => {
     const isAdmin = Boolean(req.roles.includes(ROLES_LIST.Admin))
@@ -125,9 +126,31 @@ const deleteLesson = async (req, res) => {
 
 }
 
-const viewFile = (req, res) => {
-    const filename = req.params.filename;
-    res.sendFile(path.join(__dirname, '..', 'uploads', 'lessons', filename))
+const viewFile = async(req, res) => {
+    const {id} = req.params;
+    if(!id) return res.sendStatus(400);
+
+    try{
+        console.log(id)
+        const foundFile = await Lesson.findOne({ _id: id }).exec();
+        console.log(foundFile)
+        if(!foundFile) return res.sendStatus(404);
+
+        const filename = foundFile.fileName;
+        const uri = foundFile.uri;
+
+         // Download the file from Firebase Storage
+        const response = await axios.get(uri, { responseType: 'stream' });
+
+        // Send the downloaded file to the client
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+        res.setHeader('Content-Type', response.headers['content-type']);
+        response.data.pipe(res);
+
+    }catch(err){
+        console.log(err)
+        res.sendStatus(400)
+    }
 }
 
 module.exports = { upload, viewFile, getAllLessons, editLesson, deleteLesson }
