@@ -31,7 +31,7 @@ const upload = async (req, res) => {
     const filename = req.file?.originalname;
     if (!id || !filename || !title || !fullname) return res.sendStatus(400)
 
-    const allowedExt = ['ppt', 'pptx', 'pptm', 'doc', 'docx', 'pdf', 'jpg', 'jpeg', 'png', 'txt']
+    const allowedExt = ['ppt', 'pptx', 'pptm', 'doc', 'docx', 'pdf', 'jpg', 'jpeg', 'png', 'txt', 'mp4']
     const fileExt = filename.split('.').pop().toLowerCase();
     const filePath = `lessons/${Date.now()}_${filename}`;
     if (!allowedExt.includes(fileExt)) return res.status(401).json({ 'message': 'Invalid file format.' })
@@ -74,7 +74,7 @@ const editLesson = async (req, res) => {
         if (req.file) {
             const fileName = req.file.originalname;
             const filePath = lesson.filePath;
-            const allowedExt = ['ppt', 'pptx', 'pptm', 'doc', 'docx', 'pdf', 'jpg', 'jpeg', 'png', 'txt']
+            const allowedExt = ['ppt', 'pptx', 'pptm', 'doc', 'docx', 'pdf', 'jpg', 'jpeg', 'png', 'txt', 'mp4']
             const fileExt = fileName.split('.').pop().toLowerCase();
             if (!allowedExt.includes(fileExt)) return res.status(401).json({ 'message': 'Invalid file format.' })
             // delete file from firebase 
