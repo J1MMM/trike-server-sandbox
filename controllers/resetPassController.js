@@ -49,8 +49,8 @@ const sendMail = async(req, res) => {
  				</head>
 
 		 		<body>
-		 		<div style="width: 100%; background-color: #F5F5F3; padding: 80px 40px">
-				    <div style="width: 100%; background-color: #FFF; padding: 30px 36px; max-width: 480px; margin: auto; border-radius: 10px">
+		 		<div style="width: 100%; background-color: #F5F5F3; padding: 80px 10px; box-sizing: border-box">
+				    <div style="width: 100%; background-color: #FFF; padding: 30px; max-width: 480px; margin: auto; border-radius: 10px; box-sizing: border-box">
 				        <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: xx-large">Reset your PPPedu password</h1>
 			            <p style="text-align: center; margin: 0; margin-top: 16px;">Hi ${foundUser.firstname} ${foundUser.lastname},</p>
 			            <p style="text-align: center; margin-top: 0;">We're sending you this email because you requested a password reset. Click on this link to create new password</p>
