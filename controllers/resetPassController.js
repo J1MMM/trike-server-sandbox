@@ -28,7 +28,8 @@ const sendMail = async(req, res) => {
 	 		}
 	 	})
 
-	 	const resetPageUrl = 'http://localhost:5173' 
+	 	// const resetPageUrl = 'http://localhost:5173' 
+	 	const resetPageUrl = 'https://ppp-learning-tool.vercel.app'
  		const html = `
 		 		<!DOCTYPE html>
  				<html>
