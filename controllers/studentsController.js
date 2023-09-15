@@ -75,10 +75,10 @@ const updateStudent = async (req, res) => {
 
         const sameLD = arraysHaveSameValues(student.learning_disabilities, req?.body?.learning_disabilities)
 
-        if(student.firstname == req?.body?.firstname && student.lastname == req?.body?.lastname && student.middlename == req?.body?.middlename && student.email == req?.body?.email && sameLD && pwdMatch) return res.status(304).json({"message": `No changes for user with ID: ${student._id}`})
+        if(student.firstname == req?.body?.firstname && student.lastname == req?.body?.lastname && student.middlename == req?.body?.middlename && student.email == req?.body?.email && sameLD && pwdMatch) return res.status(304).json({"message": `No changes for user with email: ${student.email}`})
 
         const duplicate = await Student.findOne({email: req.body.email}).exec()
-        if(duplicate) return res.status(409).json({'message': 'Email address already in use'})
+        if(duplicate && duplicate._id != req.body.id) return res.status(409).json({'message': 'Email address already in use'})
 
         if (req?.body?.firstname) student.firstname = req.body.firstname
         if (req?.body?.lastname) student.lastname = req.body.lastname

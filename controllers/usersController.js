@@ -49,10 +49,10 @@ const updateUser = async (req, res) => {
         }
 
 
-        if(user.firstname == req?.body?.firstname && user.lastname == req?.body?.lastname && user.middlename == req?.body?.middlename && user.email == req?.body?.email && pwdMatch) return res.status(304).json({"message": `No changes for user with ID: ${user._id}`})
+        if(user.firstname == req?.body?.firstname && user.lastname == req?.body?.lastname && user.middlename == req?.body?.middlename && user.email == req?.body?.email && pwdMatch) return res.status(304).json({"message": `No changes for user with email: ${user.email}`})
 
         const duplicate = await User.findOne({email: req.body.email}).exec()
-        if(duplicate) return res.status(409).json({'message': 'Email address already in use'})
+        if(duplicate && duplicate._id != req.body.id) return res.status(409).json({'message': 'Email address already in use'})
 
         if (req?.body?.firstname) user.firstname = req.body.firstname
         if (req?.body?.lastname) user.lastname = req.body.lastname
