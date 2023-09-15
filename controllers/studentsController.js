@@ -77,6 +77,9 @@ const updateStudent = async (req, res) => {
 
         if(student.firstname == req?.body?.firstname && student.lastname == req?.body?.lastname && student.middlename == req?.body?.middlename && student.email == req?.body?.email && sameLD && pwdMatch) return res.status(304).json({"message": `No changes for user with ID: ${student._id}`})
 
+        const duplicate = await Student.findOne({email: req.body.email}).exec()
+        if(duplicate) return res.status(409).json({'message': 'Email address already in use'})
+
         if (req?.body?.firstname) student.firstname = req.body.firstname
         if (req?.body?.lastname) student.lastname = req.body.lastname
         if (req?.body?.middlename) student.middlename = req.body.middlename
