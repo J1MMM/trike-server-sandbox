@@ -69,12 +69,18 @@ const updateUser = async (req, res) => {
 
         const updateOperation = {
           $set: {
-            // Update the fields you want to change here
+            instructor: `${user.firstname} ${user.lastname}`,
+          },
+        };
+
+        const updateLessonIns = {
+          $set: {
             instructor: `${user.firstname} ${user.lastname}`,
           },
         };
 
         await Student.updateMany({teacherID: req.body.id}, updateOperation)
+        await Lesson.updateMany({teacherID: req.body.id}, updateLessonIns)
 
         const result = await user.save();
         res.json({"success": "User updated successfully!", result})
