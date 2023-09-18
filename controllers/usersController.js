@@ -72,12 +72,13 @@ const updateUser = async (req, res) => {
 }
 
 const deleteUser = async (req, res) => {
-    const { id } = req.body;
-    if (!id) return res.sendStatus(400)
+    const { idsToDelete } = req.body;
+    console.log(idsToDelete)
+    if (!idsToDelete) return res.sendStatus(400)
 
     try {
-        await User.findByIdAndDelete(id)
-        res.status(204).json({ 'message': `User with ID: ${id} was deleted` })
+        await User.deleteMany({_id: {$in: idsToDelete}})
+        res.status(204).json({ 'message': `Users successfully deleted` })
     } catch (error) {
         res.status(400).json({ 'message': error.message })
     }
