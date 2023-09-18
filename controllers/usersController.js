@@ -1,5 +1,10 @@
 const bcrypt = require('bcrypt');
 const User = require('../model/User');
+const Lesson = require('../model/Lesson');
+const Student = require('../model/Student');
+const { storage } = require('../config/firebase.config');
+const { ref, deleteObject } = require('firebase/storage');
+
 
 const getAllUsers = async (req, res) => {
     try {
@@ -73,13 +78,24 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     const { idsToDelete } = req.body;
-    console.log(idsToDelete)
     if (!idsToDelete) return res.sendStatus(400)
 
     try {
+        const fileToDelete = await Lesson.find({teacherID: {$in: idsToDelete}}).lean().exec()
+        const filePaths = fileToDelete.map(lesson => lesson.filePath);
+        
         await User.deleteMany({_id: {$in: idsToDelete}})
-        res.status(204).json({ 'message': `Users successfully deleted` })
+        await Student.deleteMany({teacherID: {$in: idsToDelete}})
+        await Lesson.deleteMany({teacherID: {$in: idsToDelete}})
+
+        for(const filePath of filePaths){
+            const storageRef = ref(storage, filePath);
+            await deleteObject(storageRef)
+        }
+
+        res.sendStatus(204)
     } catch (error) {
+        console.log(error)
         res.status(400).json({ 'message': error.message })
     }
 }

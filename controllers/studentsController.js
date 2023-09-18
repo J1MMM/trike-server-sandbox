@@ -25,9 +25,8 @@ const getAllStudents = async (req, res) => {
 const createNewStudent = async (req, res) => {
     const { firstname, lastname, middlename, email, password, learning_disabilities } = req.body;
     const userID = req.id;
-    const instructor = req.fullname;
 
-    if (!firstname || !lastname || !email || !password || !learning_disabilities || !userID || !instructor) return res.status(400).json({ "message": "All Fields are required" })
+    if (!firstname || !lastname || !email || !password || !learning_disabilities || !userID) return res.status(400).json({ "message": "All Fields are required" })
 
     const duplicate = await Student.findOne({ "email": email }).exec()
     if (duplicate) return res.sendStatus(409) //Conflict
@@ -43,7 +42,6 @@ const createNewStudent = async (req, res) => {
             "password": hashedPwd,
             "learning_disabilities": learning_disabilities,
             "teacherID": userID,
-            "instructor": instructor
         })
         res.status(201).json({ "success": `New student ${firstname} has been created successfully!`, result })
     } catch (error) {
@@ -98,12 +96,13 @@ const updateStudent = async (req, res) => {
 }
 
 const deleteStudent = async (req, res) => {
-    const { id } = req.body
-    if (!id) return res.sendStatus(400)
+    const { idsToDelete } = req.body
+    if (!idsToDelete) return res.sendStatus(400)
 
     try {
-        await Student.findByIdAndDelete(id)
-        res.status(204).json({ 'message': `Student with ID: ${id} was deleted` })
+        await Student.deleteMany({_id: {$in: idsToDelete}})
+
+        res.sendStatus(204)
     } catch (error) {
         res.status(400).json({ 'message': error.message })
     }

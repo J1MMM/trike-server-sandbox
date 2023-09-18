@@ -33,10 +33,6 @@ const studentSchema = new Schema({
       require: true
     }
   ],
-  instructor: {
-    type: String,
-    require: true
-  },
   createdAt: {
     type: Date,
     default: Date.now,
