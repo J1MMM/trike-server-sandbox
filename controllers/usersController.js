@@ -53,7 +53,6 @@ const updateUser = async (req, res) => {
             pwdMatch = true
         }
 
-
         if(user.firstname == req?.body?.firstname && user.lastname == req?.body?.lastname && user.middlename == req?.body?.middlename && user.email == req?.body?.email && pwdMatch) return res.status(304).json({"message": `No changes for user with email: ${user.email}`})
 
         const duplicate = await User.findOne({email: req.body.email}).exec()
@@ -67,6 +66,15 @@ const updateUser = async (req, res) => {
         }
         if (req?.body?.email) user.email = req.body.email
         if (req?.body?.password) user.password = await bcrypt.hash(req.body.password, 10);
+
+        const updateOperation = {
+          $set: {
+            // Update the fields you want to change here
+            instructor: `${user.firstname} ${user.lastname}`,
+          },
+        };
+
+        await Student.updateMany({teacherID: req.body.id}, updateOperation)
 
         const result = await user.save();
         res.json({"success": "User updated successfully!", result})
@@ -83,7 +91,7 @@ const deleteUser = async (req, res) => {
     try {
         const fileToDelete = await Lesson.find({teacherID: {$in: idsToDelete}}).lean().exec()
         const filePaths = fileToDelete.map(lesson => lesson.filePath);
-        
+
         await User.deleteMany({_id: {$in: idsToDelete}})
         await Student.deleteMany({teacherID: {$in: idsToDelete}})
         await Lesson.deleteMany({teacherID: {$in: idsToDelete}})

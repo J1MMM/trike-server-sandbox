@@ -25,8 +25,9 @@ const getAllStudents = async (req, res) => {
 const createNewStudent = async (req, res) => {
     const { firstname, lastname, middlename, email, password, learning_disabilities } = req.body;
     const userID = req.id;
+    const instructor = req.fullname;
 
-    if (!firstname || !lastname || !email || !password || !learning_disabilities || !userID) return res.status(400).json({ "message": "All Fields are required" })
+    if (!firstname || !lastname || !email || !password || !learning_disabilities || !userID || !instructor) return res.status(400).json({ "message": "All Fields are required" })
 
     const duplicate = await Student.findOne({ "email": email }).exec()
     if (duplicate) return res.sendStatus(409) //Conflict
@@ -42,6 +43,7 @@ const createNewStudent = async (req, res) => {
             "password": hashedPwd,
             "learning_disabilities": learning_disabilities,
             "teacherID": userID,
+            "instructor": instructor
         })
         res.status(201).json({ "success": `New student ${firstname} has been created successfully!`, result })
     } catch (error) {
