@@ -23,11 +23,16 @@ const getAllStudents = async (req, res) => {
 }
 
 const createNewStudent = async (req, res) => {
-    const { firstname, lastname, middlename, email, password, learning_disabilities } = req.body;
+    const { firstname, lastname, middlename, email, password, learning_disabilities, gender, address, contactNo, birthday, guardian } = req.body;
     const userID = req.id;
     const instructor = req.fullname;
+        console.log(gender)
+        console.log(address)
+        console.log(guardian)
+        console.log(birthday)
+        console.log(contactNo)
+    if (!firstname || !lastname || !email || !password || !learning_disabilities || !userID || !instructor || !gender || !address || !contactNo || !birthday || !guardian) return res.status(400).json({ "message": "All Fields are required" })
 
-    if (!firstname || !lastname || !email || !password || !learning_disabilities || !userID || !instructor) return res.status(400).json({ "message": "All Fields are required" })
 
     const duplicate = await Student.findOne({ "email": email }).exec()
     if (duplicate) return res.sendStatus(409) //Conflict
@@ -41,6 +46,11 @@ const createNewStudent = async (req, res) => {
             "middlename": middlename,
             "email": email,
             "password": hashedPwd,
+            "gender": gender,
+            "guardian": guardian,
+            "birthday": birthday,
+            "contactNo": contactNo,
+            "address": address,
             "learning_disabilities": learning_disabilities,
             "teacherID": userID,
             "instructor": instructor
@@ -75,7 +85,9 @@ const updateStudent = async (req, res) => {
 
         const sameLD = arraysHaveSameValues(student.learning_disabilities, req?.body?.learning_disabilities)
 
-        if(student.firstname == req?.body?.firstname && student.lastname == req?.body?.lastname && student.middlename == req?.body?.middlename && student.email == req?.body?.email && sameLD && pwdMatch) return res.status(304).json({"message": `No changes for user with email: ${student.email}`})
+        const birthDate = new Date(req?.body?.birthday)
+
+        if(student.firstname == req?.body?.firstname && student.lastname == req?.body?.lastname && student.middlename == req?.body?.middlename && student.email == req?.body?.email && sameLD && pwdMatch && student.gender == req?.body?.gender && student.guardian == req?.body?.guardian && student.address == req?.body?.address && student.contactNo == req?.body?.contactNo && student.birthday.getTime() == birthDate.getTime()) return res.status(304).json({"message": `No changes for user with email: ${student.email}`})
 
         const duplicate = await Student.findOne({email: req.body.email}).exec()
         if(duplicate && duplicate._id != req.body.id) return res.status(409).json({'message': 'Email address already in use'})
@@ -83,6 +95,11 @@ const updateStudent = async (req, res) => {
         if (req?.body?.firstname) student.firstname = req.body.firstname
         if (req?.body?.lastname) student.lastname = req.body.lastname
         if (req?.body?.middlename) student.middlename = req.body.middlename
+        if (req?.body?.gender) student.gender = req.body.gender
+        if (req?.body?.guardian) student.guardian = req.body.guardian
+        if (req?.body?.address) student.address = req.body.address
+        if (req?.body?.contactNo) student.contactNo = req.body.contactNo
+        if (req?.body?.birthday) student.birthday = birthDate
         if(req?.body?.middlename?.trim() === ""){
             student.middlename = "";
         }
@@ -103,8 +120,9 @@ const deleteStudent = async (req, res) => {
 
     try {
         await Student.deleteMany({_id: {$in: idsToDelete}})
+        const student = await Student.find();
 
-        res.sendStatus(204)
+        res.json(student)
     } catch (error) {
         res.status(400).json({ 'message': error.message })
     }

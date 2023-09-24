@@ -24,12 +24,29 @@ const userSchema = new Schema({
     },
     refreshToken: String,
     roles: {
-        Teacher: {
+        Admin: {
             type: Number,
-            default: 1984        
+            default: 0
         },
-        Admin: Number
-    }
+         Teacher: {
+            type: Number,
+            default: 0
+        }
+    },
+    gender: {
+        type: String,
+        require: true
+    },
+    address: {
+        type: String,
+        require: true
+    },
+    contactNo: {
+        type: String,
+        require: true
+    },
 });
+// Teacher: 1984        
+// Admin: 5150
 
 module.exports = mongoose.model('User', userSchema)

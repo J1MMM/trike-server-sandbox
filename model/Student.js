@@ -14,6 +14,26 @@ const studentSchema = new Schema({
     type: String,
     require: true
   },
+  gender: {
+    type: String,
+    require: true
+  },
+  address: {
+    type: String,
+    require: true
+  },
+  guardian: {
+    type: String,
+    require: true
+  },
+  contactNo: {
+    type: String,
+    require: true
+  },
+  birthday: {
+    type: Date,
+    require: true
+  },
   password: {
     type: String,
     require: true

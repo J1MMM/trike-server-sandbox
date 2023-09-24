@@ -17,8 +17,8 @@ const getAllUsers = async (req, res) => {
 }
 
 const createUser = async (req, res) => {
-    const { email, password, firstname, lastname, middlename } = req.body;
-    if (!email || !password || !firstname || !lastname) return res.status(400).json({ "message": "All fields are required" })
+    const { email, password, firstname, lastname, middlename, gender, address, contactNo } = req.body;
+    if (!email || !password || !firstname || !lastname || !gender || !address || !contactNo) return res.status(400).json({ "message": "All fields are required" })
 
     const duplicate = await User.findOne({ email: email }).exec();
     if (duplicate) return res.status(409).json({"message": 'This Email Address is Already in use'}); //confilict
@@ -31,7 +31,11 @@ const createUser = async (req, res) => {
             "password": hashedPwd,
             "firstname": firstname,
             "lastname": lastname,
-            "middlename": middlename
+            "middlename": middlename,
+            "gender": gender,
+            "address": address,
+            "contactNo": contactNo,
+            "roles": {"Teacher": 1984}
         })
         res.status(201).json({ "success": `New user ${firstname} has been created successfully!`, result })
 
@@ -53,7 +57,7 @@ const updateUser = async (req, res) => {
             pwdMatch = true
         }
 
-        if(user.firstname == req?.body?.firstname && user.lastname == req?.body?.lastname && user.middlename == req?.body?.middlename && user.email == req?.body?.email && pwdMatch) return res.status(304).json({"message": `No changes for user with email: ${user.email}`})
+        if(user.firstname == req?.body?.firstname && user.lastname == req?.body?.lastname && user.middlename == req?.body?.middlename && user.email == req?.body?.email && pwdMatch && req?.body?.gender == user.gender && user.address == req?.body?.address && user.contactNo == req?.body?.contactNo) return res.status(304).json({"message": `No changes for user with email: ${user.email}`})
 
         const duplicate = await User.findOne({email: req.body.email}).exec()
         if(duplicate && duplicate._id != req.body.id) return res.status(409).json({'message': 'Email address already in use'})
@@ -61,6 +65,9 @@ const updateUser = async (req, res) => {
         if (req?.body?.firstname) user.firstname = req.body.firstname
         if (req?.body?.lastname) user.lastname = req.body.lastname
         if (req?.body?.middlename) user.middlename = req.body.middlename; 
+        if (req?.body?.gender) user.gender = req.body.gender;
+        if (req?.body?.address) user.address = req.body.address;
+        if (req?.body?.contactNo) user.contactNo = req.body.contactNo;
         if(req?.body?.middlename?.trim() === ""){
             user.middlename = "";
         }

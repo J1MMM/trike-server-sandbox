@@ -30,6 +30,20 @@ const lessonSchema = new Schema({
         type: String,
         required: true
     },
+    category: {
+        dyslexia: {
+            type: Boolean,
+            default: false
+        },
+         dysgraphia: {
+            type: Boolean,
+            default: false
+        },
+        dyscalculia: {
+            type: Boolean,
+            default: false
+        }
+    }
 
 });
 
