@@ -26,11 +26,11 @@ const createNewStudent = async (req, res) => {
     const { firstname, lastname, middlename, email, password, learning_disabilities, gender, address, contactNo, birthday, guardian } = req.body;
     const userID = req.id;
     const instructor = req.fullname;
-        console.log(gender)
-        console.log(address)
-        console.log(guardian)
-        console.log(birthday)
-        console.log(contactNo)
+        // console.log(gender)
+        // console.log(address)
+        // console.log(guardian)
+        // console.log(birthday)
+        // console.log(contactNo)
     if (!firstname || !lastname || !email || !password || !learning_disabilities || !userID || !instructor || !gender || !address || !contactNo || !birthday || !guardian) return res.status(400).json({ "message": "All Fields are required" })
 
 

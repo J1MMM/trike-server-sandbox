@@ -23,11 +23,12 @@ const getAllLessons = async (req, res) => {
 }
 
 const upload = async (req, res) => {
-    const title = req.body?.title
+    const { title, categories } = req.body;
     const id = req.id;
     const fullname = req.fullname;
     const filename = req.file?.originalname;
-    if (!id || !filename || !title || !fullname) return res.sendStatus(400)
+    if (!id || !filename || !title || !fullname || !categories) return res.sendStatus(400)
+    console.log(categories.split(','))
 
     const allowedExt = ['ppt', 'pptx', 'pptm', 'doc', 'docx', 'pdf', 'jpg', 'jpeg', 'png', 'txt', 'mp4']
     const fileExt = filename.split('.').pop().toLowerCase();
@@ -50,7 +51,8 @@ const upload = async (req, res) => {
             "instructor": fullname,
             "uri": downloadURL,
             "fileType": fileExt,
-            "filePath": filePath
+            "filePath": filePath,
+            "categories": categories.split(',')
         })
 
         res.status(200).json({ message: 'File uploaded successfully', result });
@@ -64,7 +66,7 @@ const upload = async (req, res) => {
 }
 
 const editLesson = async (req, res) => {
-    const { id, file } = req.body;
+    const { id, file, categories } = req.body;
     if (!id) return res.sendStatus(400)
 
     try {
@@ -96,6 +98,7 @@ const editLesson = async (req, res) => {
         }
 
         if (req?.body?.title) lesson.title = req.body.title;
+        if(req.body.categories) lesson.categories = categories.split(',')
         if (req?.filename) lesson.filename = req.filename;
 
         const result = await lesson.save();
