@@ -115,14 +115,14 @@ const updateStudent = async (req, res) => {
 }
 
 const deleteStudent = async (req, res) => {
-    const { idsToDelete } = req.body
-    if (!idsToDelete) return res.sendStatus(400)
+    const { idsToDelete} = req.body
+    if (!idsToDelete || !req.id) return res.sendStatus(400)
 
     try {
         await Student.deleteMany({_id: {$in: idsToDelete}})
-        const student = await Student.find();
+        const students = await Student.find({teacherID: req.id});  
 
-        res.json(student)
+        res.json(students)
     } catch (error) {
         res.status(400).json({ 'message': error.message })
     }
