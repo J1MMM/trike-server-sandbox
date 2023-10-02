@@ -55,7 +55,7 @@ const sendMail = async(req, res) => {
 			            <p style="text-align: center; margin: 0; margin-top: 16px;">Hi ${foundUser.firstname} ${foundUser.lastname},</p>
 			            <p style="text-align: center; margin-top: 0;">We're sending you this email because you requested a password reset. Click on this link to create new password</p>
 
-			            <a href='${resetPageUrl}/reset-password/${resetToken}' style="display: block; padding: 10px 20px; background-color: #434CE6; color: #FFF; text-decoration: none; border-radius: 10px; margin: 30px auto; width: fit-content; font-size: large; margin-top: 20px"> Set a new password </a>
+			            <a href='${resetPageUrl}/reset-password/${resetToken}' style="display: block; padding: 10px 20px; background-color: #2DA549; color: #FFF; text-decoration: none; border-radius: 10px; margin: 30px auto; width: fit-content; font-size: large; margin-top: 20px"> Set a new password </a>
 
 			            <small style="display: block;text-align: center; max-width: 80%; margin: auto">If you did not request a password reset, you can safely ignore this email. Only a person with access to your email can reset your account password</small>
 				    </div>
