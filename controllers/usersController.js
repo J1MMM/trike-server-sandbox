@@ -4,7 +4,7 @@ const Lesson = require('../model/Lesson');
 const Student = require('../model/Student');
 const { storage } = require('../config/firebase.config');
 const { ref, deleteObject } = require('firebase/storage');
-
+const nodeMailer = require('nodemailer')
 
 const getAllUsers = async (req, res) => {
     try {
@@ -37,6 +37,55 @@ const createUser = async (req, res) => {
             "contactNo": contactNo,
             "roles": {"Teacher": 1984}
         })
+
+        const transport = nodeMailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: '587',
+            secure: false,
+            auth: {
+                user: 'devjim.emailservice@gmail.com',
+                pass: 'vfxdypfebqvgiiyn'
+            }
+        })
+
+        const html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <link rel="preconnect" href="https://fonts.googleapis.com">
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+                    <style>
+                        *{
+                            font-family: 'Poppins', sans-serif;
+                        }
+                        p{
+                            font-size: large
+                        }
+                    </style>
+                </head>
+
+                <body>
+                   <div style="width: 100%; background-color: #F5F5F3; padding: 80px 10px; box-sizing: border-box">
+                        <div style="width: 100%; background-color: #FFF; padding: 30px; max-width: 550px; margin: auto; box-sizing: border-box">
+                            <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: xx-large"><span style="color: #2DA544">PPP</span><span style="color: #F75FFF">edu</span></h1>
+                            <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: x-large">Your PPPedu account has been created</h1>
+
+                            <p style="text-align: center; margin-top: 0;">Congratulations! 🎉 You have now become a part of PPPedu - The Online Learning Tool. We are absolutely thrilled to welcome you into our vibrant and dynamic learning community.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+        `
+
+        const info = await transport.sendMail({
+            from: 'PPPedu <pppedu@email.edu>',
+            to: email,
+            subject: 'Welcome to PPPedu - Your Learning Journey Begins Here!',
+            html: html
+        })
+
         res.status(201).json({ "success": `New user ${firstname} has been created successfully!`, result })
 
     } catch (error) {

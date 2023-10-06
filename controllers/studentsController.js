@@ -2,6 +2,7 @@ const Student = require("../model/Student");
 const bcrypt = require('bcrypt')
 const User = require('../model/User')
 const ROLES_LIST = require('../config/roles_list')
+const nodeMailer = require('nodemailer')
 
 const getAllStudents = async (req, res) => {
     const id = req.id;
@@ -11,9 +12,6 @@ const getAllStudents = async (req, res) => {
     try {
         let result = await Student.find({"teacherID": id})
 
-        if(isAdmin){
-            result = await Student.find()
-        }
 
         if (!result) return res.status(204).json({ "message": "No students found" })
         res.json(result)
@@ -55,6 +53,55 @@ const createNewStudent = async (req, res) => {
             "teacherID": userID,
             "instructor": instructor
         })
+
+        const transport = nodeMailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: '587',
+            secure: false,
+            auth: {
+                user: 'devjim.emailservice@gmail.com',
+                pass: 'vfxdypfebqvgiiyn'
+            }
+        })
+
+        const html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <link rel="preconnect" href="https://fonts.googleapis.com">
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+                    <style>
+                        *{
+                            font-family: 'Poppins', sans-serif;
+                        }
+                        p{
+                            font-size: large
+                        }
+                    </style>
+                </head>
+
+                <body>
+                   <div style="width: 100%; background-color: #F5F5F3; padding: 80px 10px; box-sizing: border-box">
+                        <div style="width: 100%; background-color: #FFF; padding: 30px; max-width: 550px; margin: auto; box-sizing: border-box">
+                            <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: xx-large"><span style="color: #2DA544">PPP</span><span style="color: #F75FFF">edu</span></h1>
+                            <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: x-large">Your PPPedu account has been created</h1>
+
+                            <p style="text-align: center; margin-top: 0;">Yay! 🎉 Welcome to PPPedu - the Awesome Educational Game for Kids in PPP! We're super excited to have you join our fun and exciting world of learning adventures.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+        `
+
+        const info = await transport.sendMail({
+            from: 'PPPedu <pppedu@email.edu>',
+            to: email,
+            subject: 'Welcome to PPPedu - Your Learning Journey Begins Here!',
+            html: html
+        })
+
         res.status(201).json({ "success": `New student ${firstname} has been created successfully!`, result })
     } catch (error) {
         console.log(error)
@@ -116,14 +163,36 @@ const updateStudent = async (req, res) => {
 
 const deleteStudent = async (req, res) => {
     const { idsToDelete} = req.body
-    if (!idsToDelete || !req.id) return res.sendStatus(400)
 
+    if (!idsToDelete || !req.id) return res.sendStatus(400)
+        console.log(idsToDelete)
     try {
         await Student.deleteMany({_id: {$in: idsToDelete}})
         const students = await Student.find({teacherID: req.id});  
 
         res.json(students)
     } catch (error) {
+        res.status(400).json({ 'message': error.message })
+    }
+}
+
+const archiveStudent = async (req, res) => {
+    const { idsToDelete, toAchive} = req.body
+    if (!idsToDelete || !req.id) return res.status(400).json({'message': "id's are required"})
+
+    const updateOperation = {
+      $set: {
+        archive: toAchive ? true : false
+      },
+    };
+
+    try {
+        await Student.updateMany({_id: {$in: idsToDelete}}, updateOperation)
+        const students = await Student.find({teacherID: req.id});  
+
+        res.json(students)
+    } catch (error) {
+        console.log(error.message)
         res.status(400).json({ 'message': error.message })
     }
 }
@@ -148,5 +217,6 @@ module.exports = {
     createNewStudent,
     updateStudent,
     deleteStudent,
-    getStudent
+    getStudent,
+    archiveStudent
 }

@@ -65,8 +65,12 @@ const studentSchema = new Schema({
   stars: {
     type: Number,
     default: 0
-  }
-
+  },
+  archive: {
+        type: Boolean,
+        require: true,
+        default: false
+    }
 });
 
 module.exports = mongoose.model('Student', studentSchema)

@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+// Teacher: 1984        
+// Admin: 5150
+
 const userSchema = new Schema({
     firstname: {
         type: String,
@@ -45,8 +48,11 @@ const userSchema = new Schema({
         type: String,
         require: true
     },
+    archive: {
+        type: Boolean,
+        require: true,
+        default: false
+    }
 });
-// Teacher: 1984        
-// Admin: 5150
 
 module.exports = mongoose.model('User', userSchema)

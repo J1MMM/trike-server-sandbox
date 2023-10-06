@@ -37,7 +37,11 @@ const lessonSchema = new Schema({
       require: true
     }
   ],
-
+    archive: {
+        type: Boolean,
+        require: true,
+        default: false
+    }
 });
 
 module.exports = mongoose.model('Lesson', lessonSchema)
