@@ -37,6 +37,9 @@ app.use('/refresh', require('./routes/api/refresh'))
 app.use('/logout', require('./routes/api/logout'))
 app.use('/reset-password', require('./routes/api/resetPassword'));
 app.use('/view', require('./routes/api/view'))
+// mobile app routes
+app.use('/login', require('./routes/api/login'))
+app.use('/lesson', require('./routes/api/lesson'))
 
 
 // protected routes 
@@ -62,5 +65,5 @@ app.use(errorHandler)
 
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB');
-    app.listen(PORT, () => console.log(`🚀server running on port ${PORT}`))
+    app.listen(PORT, () => console.log(`🚀 server running on port ${PORT}`))
 })

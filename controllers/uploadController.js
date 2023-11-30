@@ -5,16 +5,11 @@ const { storage } = require('../config/firebase.config');
 const axios = require('axios')
 
 const getAllLessons = async (req, res) => {
-    const isAdmin = Boolean(req.roles.includes(ROLES_LIST.Admin))
     const id = req.id;
     if (!id) return res.sendStatus(400)
 
     try {
         let result = await Lesson.find({ teacherID: id }).exec();
-        if (isAdmin) {
-            result = await Lesson.find()
-        }
-
         res.json(result)
     } catch (err) {
         res.status(400).json({ "message": err.message })
@@ -129,6 +124,30 @@ const deleteLesson = async (req, res) => {
 
 }
 
+const archiveLesson = async(req, res) => {
+    const { id, toArchive } = req.body;
+    if (!id || !req.id) return res.status(400).json({ "message": "ID and Filename are required" });
+
+    console.log(req.id)
+
+    const updateOperation = {
+      $set: {
+        archive: toArchive ? true : false
+      },
+    };
+
+    try {
+        await Lesson.updateOne({_id: id}, updateOperation)
+        const result = await Lesson.find({"teacherID": req.id}).exec()
+
+        res.status(200).json({ "message": "File archived successfully" , result})
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ 'message': error.message })
+    }
+}
+
 const viewFile = async (req, res) => {
     const { id } = req.params;
     if (!id) return res.sendStatus(400);
@@ -153,4 +172,4 @@ const viewFile = async (req, res) => {
     }
 }
 
-module.exports = { upload, viewFile, getAllLessons, editLesson, deleteLesson }
+module.exports = { upload, viewFile, getAllLessons, editLesson, deleteLesson, archiveLesson }
