@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const Class = require('../model/Class');
 const User = require('../model/User');
 const Lesson = require('../model/Lesson');
 const Student = require('../model/Student');
@@ -157,6 +158,7 @@ const deleteUser = async (req, res) => {
         await User.deleteMany({ _id: { $in: idsToDelete } })
         await Student.deleteMany({ teacherID: { $in: idsToDelete } })
         await Lesson.deleteMany({ teacherID: { $in: idsToDelete } })
+        await Class.deleteMany({ teacherID: { $in: idsToDelete } })
 
         for (const filePath of filePaths) {
             const storageRef = ref(storage, filePath);
