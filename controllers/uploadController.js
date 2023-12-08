@@ -5,11 +5,12 @@ const { storage } = require('../config/firebase.config');
 const axios = require('axios')
 
 const getAllLessons = async (req, res) => {
+    const { classID } = req.params;
     const id = req.id;
-    if (!id) return res.sendStatus(400)
+    if (!id || !classID) return res.sendStatus(400)
 
     try {
-        let result = await Lesson.find({ teacherID: id }).exec();
+        let result = await Lesson.find({ teacherID: id, classID: classID }).exec();
         res.json(result)
     } catch (err) {
         res.status(400).json({ "message": err.message })
@@ -18,12 +19,11 @@ const getAllLessons = async (req, res) => {
 }
 
 const upload = async (req, res) => {
-    const { title, categories } = req.body;
+    const { title, categories, classID } = req.body;
     const id = req.id;
     const fullname = req.fullname;
     const filename = req.file?.originalname;
-    if (!id || !filename || !title || !fullname || !categories) return res.sendStatus(400)
-    console.log(categories.split(','))
+    if (!id || !filename || !title || !fullname || !categories || !classID) return res.sendStatus(400)
 
     const allowedExt = ['ppt', 'pptx', 'pptm', 'doc', 'docx', 'pdf', 'jpg', 'jpeg', 'png', 'txt', 'mp4']
     const fileExt = filename.split('.').pop().toLowerCase();
@@ -47,6 +47,7 @@ const upload = async (req, res) => {
             "uri": downloadURL,
             "fileType": fileExt,
             "filePath": filePath,
+            "classID": classID,
             "categories": categories.split(',')
         })
 
@@ -93,7 +94,7 @@ const editLesson = async (req, res) => {
         }
 
         if (req?.body?.title) lesson.title = req.body.title;
-        if(req.body.categories) lesson.categories = categories.split(',')
+        if (req.body.categories) lesson.categories = categories.split(',')
         if (req?.filename) lesson.filename = req.filename;
 
         const result = await lesson.save();
@@ -124,23 +125,21 @@ const deleteLesson = async (req, res) => {
 
 }
 
-const archiveLesson = async(req, res) => {
-    const { id, toArchive } = req.body;
-    if (!id || !req.id) return res.status(400).json({ "message": "ID and Filename are required" });
-
-    console.log(req.id)
+const archiveLesson = async (req, res) => {
+    const { id, toArchive, classID } = req.body;
+    if (!id || !req.id || !classID) return res.status(400).json({ "message": "ID and Filename are required" });
 
     const updateOperation = {
-      $set: {
-        archive: toArchive ? true : false
-      },
+        $set: {
+            archive: toArchive ? true : false
+        },
     };
 
     try {
-        await Lesson.updateOne({_id: id}, updateOperation)
-        const result = await Lesson.find({"teacherID": req.id}).exec()
+        await Lesson.updateOne({ _id: id }, updateOperation)
+        const result = await Lesson.find({ "teacherID": req.id, "classID": classID }).exec()
 
-        res.status(200).json({ "message": "File archived successfully" , result})
+        res.status(200).json({ "message": "File archived successfully", result })
 
     } catch (error) {
         console.log(error)

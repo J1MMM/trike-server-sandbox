@@ -14,6 +14,10 @@ const lessonSchema = new Schema({
         type: String,
         required: true
     },
+    classID: {
+        type: String,
+        required: true
+    },
     fileName: {
         type: String,
         required: true
@@ -30,13 +34,13 @@ const lessonSchema = new Schema({
         type: String,
         required: true
     },
-    categories:  [
-    {
-      type: String,
-      enum: ["Dyslexia", "Dysgraphia", "Dyscalculia"],
-      require: true
-    }
-  ],
+    categories: [
+        {
+            type: String,
+            enum: ["Dyslexia", "Dysgraphia", "Dyscalculia"],
+            require: true
+        }
+    ],
     archive: {
         type: Boolean,
         require: true,

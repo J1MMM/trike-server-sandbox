@@ -46,6 +46,10 @@ const studentSchema = new Schema({
     type: String,
     require: true
   },
+  classID: {
+    type: String,
+    require: true
+  },
   learning_disabilities: [
     {
       type: String,
@@ -67,10 +71,10 @@ const studentSchema = new Schema({
     default: 0
   },
   archive: {
-        type: Boolean,
-        require: true,
-        default: false
-    }
+    type: Boolean,
+    require: true,
+    default: false
+  }
 });
 
 module.exports = mongoose.model('Student', studentSchema)

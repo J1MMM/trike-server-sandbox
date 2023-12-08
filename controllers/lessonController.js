@@ -15,15 +15,20 @@ const getAllLessons = async (req, res) => {
     if(!req.body.id || !req.body.disabilities) return res.status(401).json({'message': 'ID and disabilities is required'})
     const id = req.body.id;
     const disabilities = capitalizeFirstLetterInArray(req.body.disabilities);
+    const videoOnly = req.body.videoOnly;
 
-console.log(disabilities)
     try {
         const foundSudent = await Student.findOne({_id: id}).exec();
         if(!foundSudent) return res.status(401).json({'message': 'Student not found'})
         
         const teacherId = foundSudent.teacherID;
+        let result;
         
-        const result = await Lesson.find({teacherID: teacherId, categories: {$in: disabilities}})
+        if(videoOnly){
+            result = await Lesson.find({teacherID: teacherId, fileType: {$eq:"mp4"}, categories: {$in: disabilities}})
+        }else{
+            result = await Lesson.find({teacherID: teacherId, fileType: {$ne: "mp4"}, categories: {$in: disabilities}})
+        }
 
 
         res.json(result)

@@ -48,6 +48,7 @@ app.use('/students', require('./routes/api/students'))
 app.use('/users', require('./routes/api/users'))
 app.use('/upload', upload.single('file'), require('./routes/api/upload'));
 app.use('/download', require('./routes/api/download'));
+app.use('/class', require('./routes/api/class'));
 
 // 404 
 app.all('*', (req, res) => {
