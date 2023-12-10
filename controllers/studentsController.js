@@ -5,35 +5,12 @@ const ROLES_LIST = require('../config/roles_list')
 const nodeMailer = require('nodemailer')
 
 const getTotalStudents = async (req, res) => {
+    console.log('get');
     if (!req.id) return res.status(400).json({ "message": "ID's are required" })
 
     try {
 
-        // const result = await Student.find({ "teacherID": req.id })
-        // if (!result) return res.status(204).json({ "message": "No students found" })
-
-        const result = await Student.aggregate([
-            {
-                $match: {
-                    teacherID: req.id,
-                    classID: { $exists: true }, // Ensure students have a class ID
-                    archive: false
-                },
-            },
-            {
-                $lookup: {
-                    from: "classes",
-                    localField: "teacherID",
-                    foreignField: "teacherID",
-                    as: "classInfo",
-                },
-            },
-            {
-                $match: {
-                    "classInfo.archive": false,
-                },
-            },
-        ]);
+        const result = await Student.find({ teacherID: req.id, classArchive: false, archive: false })
 
         res.json(result)
     } catch (error) {

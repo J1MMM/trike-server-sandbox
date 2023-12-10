@@ -50,6 +50,11 @@ const studentSchema = new Schema({
     type: String,
     require: true
   },
+  classArchive: {
+    type: Boolean,
+    require: true,
+    default: false
+  },
   learning_disabilities: [
     {
       type: String,

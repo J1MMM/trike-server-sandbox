@@ -67,6 +67,7 @@ const archiveClass = async (req, res) => {
 
     try {
         await Class.updateOne({ _id: id }, { archive: toAchive })
+        await Student.updateMany({ classID: id }, { classArchive: toAchive })
         const result = await Class.find({ teacherID: req.id });
 
         res.json(result)
