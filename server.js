@@ -40,6 +40,7 @@ app.use('/view', require('./routes/api/view'))
 // mobile app routes
 app.use('/login', require('./routes/api/login'))
 app.use('/lesson', require('./routes/api/lesson'))
+app.use('/game', require('./routes/api/game'))
 
 
 // protected routes 

@@ -13,13 +13,9 @@ const handleLogin = async (req, res) => {
     if (match == false) return res.status(401).json({ message: `Incorrect password` })
 
     try {
-        const id = foundUser._id;
-        const learning_disabilities = foundUser.learning_disabilities;
         const fullname = `${foundUser.firstname.charAt(0).toUpperCase()}${foundUser.firstname.slice(1)} ${foundUser.lastname.charAt(0).toUpperCase()}${foundUser.lastname.slice(1)}`
-        const gender = foundUser.gender;
-        const stars = foundUser.stars;
 
-        res.json({ id, learning_disabilities, fullname, gender, stars })
+        res.json({ foundUser, fullname })
     } catch (error) {
         console.log(error)
         res.status(400).json({ "message": error.message })
