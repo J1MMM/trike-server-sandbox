@@ -69,11 +69,12 @@ const createUser = async (req, res) => {
 
                 <body>
                    <div style="width: 100%; background-color: #F5F5F3; padding: 80px 10px; box-sizing: border-box">
-                        <div style="width: 100%; background-color: #FFF; padding: 30px; max-width: 550px; margin: auto; box-sizing: border-box">
+                        <div style="width: 100%; background-color: #FFF; padding: 30px; max-width: 550px; margin: auto; box-sizing: border-box;">
                             <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: xx-large"><span style="color: #2DA544">PPP</span><span style="color: #F75FFF">edu</span></h1>
                             <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: x-large">Your PPPedu account has been created</h1>
 
                             <p style="text-align: center; margin-top: 0;">Congratulations! 🎉 You have now become a part of PPPedu - The Online Learning Tool. We are absolutely thrilled to welcome you into our vibrant and dynamic learning community.</p>
+                            <a href="https://ppp-learning-tool.vercel.app/" style="width: 100%; box-sizing: border-box; display: block; font-size: large; background-color: #2DA544; color: #FFF; padding: 8px 16px; text-decoration: none; font-family: sans-serif; text-align: center; justify-content: center;">Login Now!</a>
                         </div>
                     </div>
                 </body>

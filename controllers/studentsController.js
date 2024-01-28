@@ -35,13 +35,16 @@ const getAllStudents = async (req, res) => {
 }
 
 const createNewStudent = async (req, res) => {
-    const { firstname, lastname, middlename, email, password, learning_disabilities, gender, address, contactNo, birthday, guardian, classID } = req.body;
+    const { firstname, lastname, middlename, username, email, password, learning_disabilities, gender, address, contactNo, birthday, guardian, classID } = req.body;
     const userID = req.id;
     const instructor = req.fullname;
-    if (!firstname || !lastname || !email || !password || !learning_disabilities || !userID || !instructor || !gender || !address || !contactNo || !birthday || !guardian || !classID) return res.status(400).json({ "message": "All Fields are required" })
+    if (!firstname || !lastname || !email || !username || !password || !learning_disabilities || !userID || !instructor || !gender || !address || !contactNo || !birthday || !guardian || !classID) return res.status(400).json({ "message": "All Fields are required" })
 
-    const duplicate = await Student.findOne({ "email": email }).exec()
-    if (duplicate) return res.sendStatus(409) //Conflict
+    const duplicateEmail = await Student.findOne({ "email": email }).exec()
+    const duplicateUsername = await Student.findOne({ "username": username }).exec()
+
+    if (duplicateEmail) return res.status(409).json({ message: "The email address is already in use" }) //Conflict
+    if (duplicateUsername) return res.status(409).json({ message: "The username is already in use" }) //Conflict
 
     try {
         const hashedPwd = await bcrypt.hash(password, 10)
@@ -50,6 +53,7 @@ const createNewStudent = async (req, res) => {
             "firstname": firstname,
             "lastname": lastname,
             "middlename": middlename,
+            "username": username,
             "email": email,
             "password": hashedPwd,
             "gender": gender,
@@ -94,10 +98,13 @@ const createNewStudent = async (req, res) => {
                 <body>
                    <div style="width: 100%; background-color: #F5F5F3; padding: 80px 10px; box-sizing: border-box">
                         <div style="width: 100%; background-color: #FFF; padding: 30px; max-width: 550px; margin: auto; box-sizing: border-box">
-                            <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: xx-large"><span style="color: #2DA544">PPP</span><span style="color: #F75FFF">edu</span></h1>
-                            <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: x-large">Your PPPedu account has been created</h1>
+                            <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: xx-large"><span style="color: #2DA544">PPP</span><span style="color: #F75FFF">Kids</span></h1>
+                            <h1 style="margin: 0; text-align: center; font-weight: bold; font-size: x-large">Your PPPKids account has been created</h1>
 
-                            <p style="text-align: center; margin-top: 0;">Yay! 🎉 Welcome to PPPedu - the Awesome Educational Game for Kids in PPP! We're super excited to have you join our fun and exciting world of learning adventures.</p>
+                            <p style="text-align: center; margin-top: 0;">Yay! 🎉 Welcome to PPPKids - the Awesome Educational Game for Kids in PPP! We're super excited to have you join our fun and exciting world of learning adventures.</p>
+
+                            <a href="https://www.mediafire.com/file/y45umlcnui5uxsa/PPPKids.apk/file" style="width: 100%; box-sizing: border-box; display: block; font-size: large; background-color: #2DA544; color: #FFF; padding: 8px 16px; text-decoration: none; font-family: sans-serif; text-align: center; justify-content: center;">Download PPPKids Now!</a>
+
                         </div>
                     </div>
                 </body>
@@ -107,7 +114,7 @@ const createNewStudent = async (req, res) => {
         const info = await transport.sendMail({
             from: 'PPPedu <pppedu@email.edu>',
             to: email,
-            subject: 'Welcome to PPPedu - Your Learning Journey Begins Here!',
+            subject: 'Welcome to PPPKids - Your Learning Journey Begins Here!',
             html: html
         })
 
@@ -143,14 +150,18 @@ const updateStudent = async (req, res) => {
 
         const birthDate = new Date(req?.body?.birthday)
 
-        if (student.firstname == req?.body?.firstname && student.lastname == req?.body?.lastname && student.middlename == req?.body?.middlename && student.email == req?.body?.email && sameLD && pwdMatch && student.gender == req?.body?.gender && student.guardian == req?.body?.guardian && student.address == req?.body?.address && student.contactNo == req?.body?.contactNo && student.birthday.getTime() == birthDate.getTime()) return res.status(304).json({ "message": `No changes for user with email: ${student.email}` })
+        if (student.firstname == req?.body?.firstname && student.username == req?.body?.username && student.lastname == req?.body?.lastname && student.middlename == req?.body?.middlename && student.email == req?.body?.email && sameLD && pwdMatch && student.gender == req?.body?.gender && student.guardian == req?.body?.guardian && student.address == req?.body?.address && student.contactNo == req?.body?.contactNo && student.birthday.getTime() == birthDate.getTime()) return res.status(304).json({ "message": `No changes for user with email: ${student.email}` })
 
-        const duplicate = await Student.findOne({ email: req.body.email }).exec()
-        if (duplicate && duplicate._id != req.body.id) return res.status(409).json({ 'message': 'Email address already in use' })
+        const duplicateEmail = await Student.findOne({ email: req.body.email }).exec()
+        const duplicateUsername = await Student.findOne({ username: req.body.username }).exec()
+
+        if (duplicateEmail && duplicateEmail._id != req.body.id) return res.status(409).json({ 'message': 'The email address is already in use' })
+        if (duplicateUsername && duplicateUsername._id != req.body.id) return res.status(409).json({ 'message': 'Username is already in use' })
 
         if (req?.body?.firstname) student.firstname = req.body.firstname
         if (req?.body?.lastname) student.lastname = req.body.lastname
         if (req?.body?.middlename) student.middlename = req.body.middlename
+        if (req?.body?.username) student.username = req.body.username
         if (req?.body?.gender) student.gender = req.body.gender
         if (req?.body?.guardian) student.guardian = req.body.guardian
         if (req?.body?.address) student.address = req.body.address

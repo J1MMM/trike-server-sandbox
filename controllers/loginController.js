@@ -4,10 +4,10 @@ const Student = require('../model/Student');
 
 const handleLogin = async (req, res) => {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "Email and Password are required" })
+    if (!email || !password) return res.status(400).json({ message: "Username and Password are required" })
 
-    const foundUser = await Student.findOne({ email }).exec();
-    if (!foundUser) return res.status(401).json({ message: `Account with email '${email}' not found` })
+    const foundUser = await Student.findOne({ username: email }).exec();
+    if (!foundUser) return res.status(401).json({ message: `Account with username '${email}' not found` })
 
     const match = await bcrypt.compare(password, foundUser.password);
     if (match == false) return res.status(401).json({ message: `Incorrect password` })
