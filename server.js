@@ -32,6 +32,8 @@ app.use('/', express.static(path.join(__dirname, '/public')));
 
 //routes
 app.use('/', require('./routes/root'))
+app.use('/franchise', require('./routes/api/franchise'))
+
 app.use('/auth', require('./routes/api/auth'))
 app.use('/refresh', require('./routes/api/refresh'))
 app.use('/logout', require('./routes/api/logout'))
