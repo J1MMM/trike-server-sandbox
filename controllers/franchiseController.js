@@ -1,8 +1,13 @@
-const path = require('path')
+const Franchise = require('../model/Franchise')
 
-const getAllData = (req, res) => {
+const getAllData = async(req, res) => {
+  try {
+      const result = await Franchise.find().exec()
+      res.json(result)
+  } catch (err) {
+    res.status(500).json({ "message": err.message })
 
-      res.status(200).send('ok gg wp');
+  }
 
 }
 
