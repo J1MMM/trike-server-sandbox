@@ -1221,3 +1221,8 @@
 2024/02/21	07:44:52	cffc9336-3ad8-4121-bcd3-4bd71516e0f0	GET	undefined	/
 2024/02/21	07:44:52	5617df70-6c05-4505-bc93-8dbae61ea212	GET	undefined	/css/style.css
 2024/02/21	07:44:52	778391bc-3420-4bb2-8555-fd4f541fd7fc	GET	undefined	/favicon.ico
+2024/02/22	13:06:17	60dc782e-6735-4b8f-b0fa-edf87b48ffe0	GET	undefined	/
+2024/02/22	13:06:17	55f57f96-5746-49cc-805a-6e441faac090	GET	undefined	/css/style.css
+2024/02/22	13:06:17	3e3e53cd-d464-4aa1-8be3-0456cab2ecdc	GET	undefined	/favicon.ico
+2024/02/22	13:08:20	9ee54cf3-e071-43f7-8ec8-fa567a8d4d4d	GET	undefined	/franchise
+2024/02/22	13:08:20	70bc080b-df37-4a21-8f86-4f5183332d90	GET	undefined	/favicon.ico

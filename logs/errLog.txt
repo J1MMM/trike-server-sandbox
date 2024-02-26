@@ -31,3 +31,13 @@
 2023/11/08	17:27:37	20594ad5-a6a8-4d85-b7c4-03604678d4f7	Error: Not allowed by CORS
 2023/11/08	17:27:37	916dcfe5-e06d-43f1-a72c-4dbc93ff32ed	Error: Not allowed by CORS
 2023/11/24	08:59:37	e76e8cbd-6397-47ee-ae47-d77b5fa77701	Error: Cannot set headers after they are sent to the client
+2024/02/22	13:05:15	d356ced3-521c-426a-944f-956d969164f0	Error: Not allowed by CORS
+2024/02/22	13:05:15	56dc1391-5082-499a-93ff-67963336e96b	Error: Not allowed by CORS
+2024/02/22	13:05:19	10c55bb7-5ff3-4f73-8016-7f42ea0f0f7a	Error: Not allowed by CORS
+2024/02/22	13:05:19	57181e87-2975-40ae-9b22-5966bed41979	Error: Not allowed by CORS
+2024/02/22	13:05:45	b778ace1-df9d-41ef-bfb1-566efaa3b9a1	Error: Not allowed by CORS
+2024/02/22	13:05:46	8686b753-8f42-4660-8bab-d192f8f3fc05	Error: Not allowed by CORS
+2024/02/22	13:07:00	07d79c2b-23b2-40ec-bba9-d93a78d11038	Error: Not allowed by CORS
+2024/02/22	13:07:00	de43bcb7-08d5-4ef7-ba33-9dd2c539efc6	Error: Not allowed by CORS
+2024/02/22	13:07:28	68a8273b-739f-4a25-a09e-13b6259c1d5c	Error: Not allowed by CORS
+2024/02/22	13:07:28	5c484181-f39f-4fe1-bf5b-c993ca97fa1b	Error: Not allowed by CORS
