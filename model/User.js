@@ -27,14 +27,26 @@ const userSchema = new Schema({
     },
     refreshToken: String,
     roles: {
+        SuperAdmin: {
+            type: Number,
+            default: 0
+        },
         Admin: {
             type: Number,
             default: 0
         },
-         Teacher: {
+        CTMO1: {
             type: Number,
             default: 0
-        }
+        },
+        CTMO2: {
+            type: Number,
+            default: 0
+        },
+        CTMO3: {
+            type: Number,
+            default: 0
+        },
     },
     gender: {
         type: String,

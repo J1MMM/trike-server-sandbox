@@ -5,11 +5,11 @@ const { createClass, getClasses, archiveClass, updateClass, deleteClass } = requ
 const router = express.Router()
 
 router.route('/')
-    .get(verifyRoles(ROLES_LIST.Teacher), getClasses)
-    .post(verifyRoles(ROLES_LIST.Teacher), createClass)
-    .put(verifyRoles(ROLES_LIST.Teacher), updateClass)
-    .patch(verifyRoles(ROLES_LIST.Teacher), archiveClass)
-    .delete(verifyRoles(ROLES_LIST.Teacher), deleteClass)
+    .get(verifyRoles(ROLES_LIST.CTMO1), getClasses)
+    .post(verifyRoles(ROLES_LIST.CTMO1), createClass)
+    .put(verifyRoles(ROLES_LIST.CTMO1), updateClass)
+    .patch(verifyRoles(ROLES_LIST.CTMO1), archiveClass)
+    .delete(verifyRoles(ROLES_LIST.CTMO1), deleteClass)
 
 
 module.exports = router

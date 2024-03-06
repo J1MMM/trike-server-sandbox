@@ -5,11 +5,11 @@ const { getAllUsers, updateUser, deleteUser, createUser, getUser, archiveUser } 
 const router = express.Router()
 
 router.route('/')
-    .get(verifyRoles(ROLES_LIST.Admin), getAllUsers)
-    .post(verifyRoles(ROLES_LIST.Admin), createUser)
-    .put(verifyRoles(ROLES_LIST.Admin), updateUser)
-    .delete(verifyRoles(ROLES_LIST.Admin), deleteUser)
-    .patch(verifyRoles(ROLES_LIST.Admin), archiveUser)
+    .get(verifyRoles(ROLES_LIST.SuperAdmin), getAllUsers)
+    .post(verifyRoles(ROLES_LIST.SuperAdmin), createUser)
+    .put(verifyRoles(ROLES_LIST.SuperAdmin), updateUser)
+    .delete(verifyRoles(ROLES_LIST.SuperAdmin), deleteUser)
+    .patch(verifyRoles(ROLES_LIST.SuperAdmin), archiveUser)
 
 
 router.route('/:id')

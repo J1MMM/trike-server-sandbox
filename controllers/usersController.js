@@ -5,7 +5,8 @@ const Lesson = require('../model/Lesson');
 const Student = require('../model/Student');
 const { storage } = require('../config/firebase.config');
 const { ref, deleteObject } = require('firebase/storage');
-const nodeMailer = require('nodemailer')
+const nodeMailer = require('nodemailer');
+const ROLES_LIST = require('../config/roles_list');
 
 const getAllUsers = async (req, res) => {
     try {
@@ -18,8 +19,8 @@ const getAllUsers = async (req, res) => {
 }
 
 const createUser = async (req, res) => {
-    const { email, password, firstname, lastname, middlename, gender, address, contactNo } = req.body;
-    if (!email || !password || !firstname || !lastname || !gender || !address || !contactNo) return res.status(400).json({ "message": "All fields are required" })
+    const { email, password, firstname, lastname, middlename, gender, address, contactNo, role } = req.body;
+    if (!email || !password || !firstname || !lastname || !gender || !address || !contactNo || !role) return res.status(400).json({ "message": "All fields are required" })
 
     const duplicate = await User.findOne({ email: email }).exec();
     if (duplicate) return res.status(409).json({ "message": 'This Email Address is Already in use' }); //confilict
@@ -36,7 +37,7 @@ const createUser = async (req, res) => {
             "gender": gender,
             "address": address,
             "contactNo": contactNo,
-            "roles": { "Teacher": 1984 }
+            "roles": { [role]: ROLES_LIST[role] }
         })
 
         const transport = nodeMailer.createTransport({

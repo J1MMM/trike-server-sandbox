@@ -1,43 +1,12 @@
-2023/09/04	07:52:33	4e183159-f2bd-4d5b-9b81-f374143af5ce	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693784414381_animationnijamespogi.pptx'
-2023/09/04	07:55:00	fbd92982-2379-489a-9a8b-661d10ee2bb6	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693785286828_BaraeroJimuel_Finals Online activity.pdf'
-2023/09/04	09:47:05	a509a579-f1e5-4da3-a780-0e5602f5c602	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693791926740_1693716580870_1693449457494_Baraero, Jimuel_Chart_sample.jpg'
-2023/09/04	09:47:09	9cb288d9-0894-4903-8241-a14eb260cf66	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693791926740_1693716580870_1693449457494_Baraero, Jimuel_Chart_sample.jpg'
-2023/09/04	09:47:35	58f478ac-90e0-4549-8849-ab412a29e2d1	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693792023770_1693398201650_325949536_698006291798309_7047435983434132647_n.jpg'
-2023/09/04	09:48:41	d2a02aa0-d9c8-455b-a6fc-b83ebced5f93	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693792023770_1693398201650_325949536_698006291798309_7047435983434132647_n.jpg'
-2023/09/04	09:49:17	7ba41275-08ca-4680-bd3b-70d8e76b322f	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693792052957_1693716580870_1693449457494_Baraero, Jimuel_Chart_sample.jpg'
-2023/09/04	09:50:56	f11a0581-590d-4c8c-bc62-7ab7e2191f87	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693792155079_1693716580870_1693449457494_Baraero, Jimuel_Chart_sample.jpg'
-2023/09/04	09:51:38	a216a7ec-726c-4560-8ac1-78c1aac4e17b	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693792253844_1693716772776_download (2).jpg'
-2023/09/04	09:51:55	ab67c045-9bc8-4b3f-bc98-816a7f6c3edb	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693792253844_1693716772776_download (2).jpg'
-2023/09/04	09:54:27	db73341f-9041-47ce-a13f-07a1a3dbd95e	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693792342140_1693791926740_1693716580870_1693449457494_Baraero, Jimuel_Chart_sample.jpg'
-2023/09/04	09:54:59	96d2cdbb-9c4a-45c3-b0ce-b7892fdf3c01	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693792419346_banner1.jpg'
-2023/09/04	09:55:07	f0749f61-d060-42ac-860d-4fc6934416c8	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693792419346_banner1.jpg'
-2023/09/04	09:55:11	86e42ae2-2470-4142-8ae8-baacff4bde5b	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\1693792419346_banner1.jpg'
-2023/09/05	12:26:53	52336bdf-7a13-4c1a-afa7-5d62d6a00968	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\banner6.jpg'
-2023/09/05	12:26:58	8a2acccb-b0f4-43a6-811a-11f8e23952b2	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\banner6.jpg'
-2023/09/06	06:51:23	4bd2c4e8-4874-4c3c-b0c8-2614a50a2441	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\banner9.jpg'
-2023/09/06	06:52:17	c67c8eb2-52c9-46bc-949b-d7b73f2e3afc	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\banner9.jpg'
-2023/09/06	06:57:34	efbeb154-891c-4f7d-877b-f504c9434bf2	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\2nd'-sem.pdf'
-2023/09/06	06:57:34	e8b46f9c-49d0-403b-89ee-11ce63b92aa6	Error: ENOENT: no such file or directory, stat 'C:\Users\Ruby Anne\Desktop\Web development\00-caps\caps-server\uploads\lessons\2nd'-sem.pdf'
-2023/09/07	08:32:43	97415d8c-fc74-47ba-bee0-e005c340c0b4	Error: Not allowed by CORS
-2023/09/07	08:33:17	b6c0abfc-a8d2-461f-89ea-5c168d0682bf	Error: Not allowed by CORS
-2023/09/07	08:38:01	02e35bde-214a-4db0-bac9-009787f1bf3b	Error: Not allowed by CORS
-2023/09/07	08:41:18	8301d1d0-3e36-4012-937f-89cd5153c421	Error: Not allowed by CORS
-2023/09/07	08:41:31	21e13033-5ac5-4448-901e-59cdcf935de8	Error: Not allowed by CORS
-2023/09/07	08:41:33	42186458-48e1-46d0-9c80-5ae2858d27a5	Error: Not allowed by CORS
-2023/09/07	08:51:06	21f6a6e4-953b-4389-a737-e97aa1ce7895	Error: Not allowed by CORS
-2023/09/07	09:20:11	5d4dc447-b6bc-413f-a5b2-b1941a7cf00c	Error: Cannot set headers after they are sent to the client
-2023/11/08	17:18:24	2ba401dd-58d4-4fba-86ed-360a391589fe	Error: Not allowed by CORS
-2023/11/08	17:18:24	fe8e533a-202c-487b-8546-2e1313b5d2a5	Error: Not allowed by CORS
-2023/11/08	17:27:37	20594ad5-a6a8-4d85-b7c4-03604678d4f7	Error: Not allowed by CORS
-2023/11/08	17:27:37	916dcfe5-e06d-43f1-a72c-4dbc93ff32ed	Error: Not allowed by CORS
-2023/11/24	08:59:37	e76e8cbd-6397-47ee-ae47-d77b5fa77701	Error: Cannot set headers after they are sent to the client
-2024/02/22	13:05:15	d356ced3-521c-426a-944f-956d969164f0	Error: Not allowed by CORS
-2024/02/22	13:05:15	56dc1391-5082-499a-93ff-67963336e96b	Error: Not allowed by CORS
-2024/02/22	13:05:19	10c55bb7-5ff3-4f73-8016-7f42ea0f0f7a	Error: Not allowed by CORS
-2024/02/22	13:05:19	57181e87-2975-40ae-9b22-5966bed41979	Error: Not allowed by CORS
-2024/02/22	13:05:45	b778ace1-df9d-41ef-bfb1-566efaa3b9a1	Error: Not allowed by CORS
-2024/02/22	13:05:46	8686b753-8f42-4660-8bab-d192f8f3fc05	Error: Not allowed by CORS
-2024/02/22	13:07:00	07d79c2b-23b2-40ec-bba9-d93a78d11038	Error: Not allowed by CORS
-2024/02/22	13:07:00	de43bcb7-08d5-4ef7-ba33-9dd2c539efc6	Error: Not allowed by CORS
-2024/02/22	13:07:28	68a8273b-739f-4a25-a09e-13b6259c1d5c	Error: Not allowed by CORS
-2024/02/22	13:07:28	5c484181-f39f-4fe1-bf5b-c993ca97fa1b	Error: Not allowed by CORS
+2024/02/26	10:01:01	7eada82e-22db-47cb-aca4-4e260f0844f5	Error: Not allowed by CORS
+2024/02/26	10:01:01	c3885503-447d-4136-97d4-90426cb38c0f	Error: Not allowed by CORS
+2024/02/26	10:01:46	753df3ca-b7af-4ba9-9a18-eeef3286398f	Error: Not allowed by CORS
+2024/02/26	10:01:46	54fb83a4-4875-4588-a9b0-519dd850939d	Error: Not allowed by CORS
+2024/02/26	10:06:19	d7a6b7d2-37dd-48aa-af04-8f1e14a95347	Error: Not allowed by CORS
+2024/02/26	10:06:19	08bf12b7-3946-49a3-bbe5-985784557c83	Error: Not allowed by CORS
+2024/02/26	10:06:56	fa99837b-25b9-4b0c-9dba-51dc66300b9e	Error: Not allowed by CORS
+2024/02/26	10:06:56	f23e3f5c-0cae-4c99-8786-61a29eb02ec1	Error: Not allowed by CORS
+2024/02/26	10:08:49	43708557-6047-44cf-b6b8-d3209c62626e	Error: Not allowed by CORS
+2024/02/26	10:08:49	1b7b87d2-5b32-407e-958c-178101810bca	Error: Not allowed by CORS
+2024/02/26	10:09:29	e490342f-36af-44c9-9d92-646103d07dc0	Error: Not allowed by CORS
+2024/02/26	10:09:29	7b866679-3a26-46ce-999d-9655391098bb	Error: Not allowed by CORS

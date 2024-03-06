@@ -19,7 +19,7 @@ const getTotalStudents = async (req, res) => {
     }
 }
 
-const getAllStudents = async (req, res) => {
+const getAllStudenst = async (req, res) => {
     const { classID } = req.params;
 
     if (!req.id || !classID) return res.status(400).json({ "message": "ID's are required" })
@@ -233,7 +233,7 @@ const getStudent = async (req, res) => {
 }
 
 module.exports = {
-    getAllStudents,
+    getAllStudenst,
     createNewStudent,
     updateStudent,
     deleteStudent,

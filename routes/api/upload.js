@@ -5,12 +5,12 @@ const ROLES_LIST = require('../../config/roles_list');
 const router = express.Router()
 
 router.route('/:classID')
-	.get(verifyRoles(ROLES_LIST.Teacher, ROLES_LIST.Admin), getAllLessons)
+	.get(verifyRoles(ROLES_LIST.CTMO1, ROLES_LIST.Admin), getAllLessons)
 
 router.route('/')
-	.post(verifyRoles(ROLES_LIST.Teacher, ROLES_LIST.Admin), upload)
-	.put(verifyRoles(ROLES_LIST.Teacher, ROLES_LIST.Admin), editLesson)
-	.delete(verifyRoles(ROLES_LIST.Teacher, ROLES_LIST.Admin), deleteLesson)
-	.patch(verifyRoles(ROLES_LIST.Teacher), archiveLesson)
+	.post(verifyRoles(ROLES_LIST.CTMO1, ROLES_LIST.Admin), upload)
+	.put(verifyRoles(ROLES_LIST.CTMO1, ROLES_LIST.Admin), editLesson)
+	.delete(verifyRoles(ROLES_LIST.CTMO1, ROLES_LIST.Admin), deleteLesson)
+	.patch(verifyRoles(ROLES_LIST.CTMO1), archiveLesson)
 
 module.exports = router

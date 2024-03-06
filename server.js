@@ -12,16 +12,17 @@ const verifyJWT = require('./middleware/verifyJWT');
 const cookieParser = require('cookie-parser');
 const credentials = require('./middleware/credentials');
 const multer = require('multer');
+
+const allowedOrigins = require('./config/allowedOrigin');
+
 const PORT = process.env.PORT || 3500;
 const upload = multer({ storage: multer.memoryStorage() })
-
 // connect to mongooDB 
 connectDB();
 // custom middleware 
-// app.use(credentials)
+app.use(credentials)
 app.use(cors(corsOption))
 app.use(logger)
-
 // middleware for form data
 app.use(express.urlencoded({ extended: false }));
 // middleware for json data 
