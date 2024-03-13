@@ -1,36 +1,42 @@
-const User = require('../model/User')
-const jwt = require('jsonwebtoken')
-const nodeMailer = require('nodemailer')
-const bcrypt = require('bcrypt')
+const User = require("../model/User");
+const jwt = require("jsonwebtoken");
+const nodeMailer = require("nodemailer");
+const bcrypt = require("bcrypt");
 
-const sendMail = async(req, res) => {
-	const { email } = req.body.data; 
-	if(!email) return res.status(400).json({'message': 'Email is required'});
+const sendMail = async (req, res) => {
+  const { email } = req.body.data;
+  console.log("reset");
+  if (!email) return res.status(400).json({ message: "Email is required" });
 
-	try{
-		const foundUser = await User.findOne({email}).exec()
-		if(!foundUser) return res.status(404).json({'message': "We didn't recognize that email."})
+  try {
+    const foundUser = await User.findOne({ email }).exec();
+    if (!foundUser)
+      return res
+        .status(404)
+        .json({ message: "We didn't recognize that email." });
 
-		const payload = {
-			email: foundUser.email,
-			id: foundUser._id
-		}
+    const payload = {
+      email: foundUser.email,
+      id: foundUser._id,
+    };
 
-	 	const resetToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m' })
+    const resetToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "5m",
+    });
 
-	 	const transport = nodeMailer.createTransport({
-	 		host: 'smtp.gmail.com',
-	 		port: '587',
-	 		secure: false,
-	 		auth: {
-	 			user: 'devjim.emailservice@gmail.com',
-	 			pass: 'vfxdypfebqvgiiyn'
-	 		}
-	 	})
+    const transport = nodeMailer.createTransport({
+      host: "smtp.gmail.com",
+      port: "587",
+      secure: false,
+      auth: {
+        user: "devjim.emailservice@gmail.com",
+        pass: "vfxdypfebqvgiiyn",
+      },
+    });
 
-	 	// const resetPageUrl = 'http://localhost:5173' 
-	 	const resetPageUrl = 'https://ppp-learning-tool.vercel.app'
- 		const html = `
+    // const resetPageUrl = 'http://localhost:5173'
+    const resetPageUrl = "https://ppp-learning-tool.vercel.app";
+    const html = `
 		 		<!DOCTYPE html>
  				<html>
  				<head>
@@ -62,60 +68,59 @@ const sendMail = async(req, res) => {
 				</div>
 			    </body>
 			    </html>
-		`
+		`;
 
-	 	const info = await transport.sendMail({
-	 		from: 'PPPedu <pppedu@email.edu>',
-	 		to: email,
-	 		subject: 'Password Reset',
-	 		html: html
-	 	})
+    const info = await transport.sendMail({
+      from: "PPPedu <pppedu@email.edu>",
+      to: email,
+      subject: "Password Reset",
+      html: html,
+    });
 
-		res.json({"message": `We've sent password reset link to: ${email}`})
-	}catch(err){
-		console.log(err)
-	}
+    res.json({ message: `We've sent password reset link to: ${email}` });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-}
+const checkToken = async (req, res) => {
+  const { token } = req.params;
+  if (!token) return res.status(400).json({ message: "Token is required" });
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    if (!decoded) return res.sendStatus(400);
 
-const checkToken = async(req, res) => {
-	const { token } = req.params;
-	if(!token) return res.status(400).json({'message': 'Token is required'})
-	try{
-		const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-		if(!decoded) return res.sendStatus(400)
+    const foundUser = await User.findOne({ email: decoded.email }).exec();
+    if (!foundUser) return res.status(404).json({ message: "User not found" });
 
-		const foundUser = await User.findOne({email: decoded.email}).exec();
-		if(!foundUser) return res.status(404).json({'message': 'User not found'})
+    res.json({ message: "token verified" });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
 
-		res.json({'message': 'token verified'})
-	}catch(err){
-		res.status(400).json({'message': err.message})
-	}
-}
+const updatePwd = async (req, res) => {
+  const { pwd, token } = req.body;
+  console.log(req.body);
+  if (!pwd || !token)
+    return res.status(400).json({ message: "password and token are required" });
 
-const updatePwd = async(req, res) => {
-	const { pwd, token } = req.body;
-	console.log(req.body)
-	if(!pwd || !token) return res.status(400).json({'message': 'password and token are required'});
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    if (!decoded) return res.status(400).json({ message: "Invalid token" });
 
-	try{
-		const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-		if(!decoded) return res.status(400).json({'message': 'Invalid token'})
+    const foundUser = await User.findOne({ _id: decoded.id }).exec();
+    if (!foundUser) return res.status(404).json({ message: "User not found" });
 
-		const foundUser = await User.findOne({_id: decoded.id}).exec()
-		if(!foundUser) return res.status(404).json({'message': 'User not found'})
+    const hashedPwd = await bcrypt.hash(pwd, 10);
 
-		const hashedPwd = await bcrypt.hash(pwd, 10);
-
-		if(pwd) foundUser.password = hashedPwd;
-		await foundUser.save();
-		res.json({"message": "Your password has been changed successfully."})
-
-	}catch(err){
-		console.log(err)
-		res.json({'message': err.message})
-	}
-}
+    if (pwd) foundUser.password = hashedPwd;
+    await foundUser.save();
+    res.json({ message: "Your password has been changed successfully." });
+  } catch (err) {
+    console.log(err);
+    res.json({ message: err.message });
+  }
+};
 
 module.exports = { sendMail, updatePwd, checkToken };
