@@ -77,9 +77,111 @@ const getAllAvailableMTOPs = async (req, res) => {
   }
 };
 
+const addNewFranchise = async (req, res) => {
+  try {
+    const {
+      mtop,
+      dateRenewal,
+      ownerFname,
+      ownerLname,
+      ownerMI,
+      ownerAddress,
+      ownerContact,
+      driverFullname,
+      driverAddress,
+      driverContact,
+      model,
+      plateno,
+      motorno,
+      stroke,
+      chasisno,
+      fueldisp,
+      OR,
+      CR,
+      tplProvider,
+      tplDate1,
+      tplDate2,
+      typeOfFranchise,
+      kindOfBusiness,
+      toda,
+      route,
+      remarks,
+      complaints,
+      DateReleaseOfSTTP,
+    } = req.body;
+
+    if (
+      !mtop ||
+      !dateRenewal ||
+      !ownerFname ||
+      !ownerLname ||
+      !ownerAddress ||
+      !ownerContact ||
+      !driverFullname ||
+      !driverAddress ||
+      !driverContact ||
+      !model ||
+      !plateno ||
+      !motorno ||
+      !OR ||
+      !CR
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    // Check if a document with the same MTOP already exists
+    const existingFranchise = await Franchise.findOne({
+      MTOP: mtop,
+      isArchived: false,
+    });
+
+    if (existingFranchise) {
+      return res.status(400).json({ error: "MTOP already exists" });
+    }
+
+    // Create a new franchise document and save it to the database
+    const newFranchise = await Franchise.create({
+      MTOP: mtop,
+      DATE_RENEWAL: dateRenewal,
+      FIRSTNAME: ownerFname,
+      LASTNAME: ownerLname,
+      MI: ownerMI,
+      ADDRESS: ownerAddress,
+      DRIVERS_NAME: driverFullname,
+      DRIVERS_ADDRESS: driverAddress,
+      OWNER_NO: ownerContact,
+      DRIVER_NO: driverContact,
+      MODEL: model,
+      PLATE_NO: plateno,
+      MOTOR_NO: motorno,
+      STROKE: stroke,
+      CHASSIS_NO: chasisno,
+      FUEL_DISP: fueldisp,
+      OR: OR,
+      CR: CR,
+      TPL_PROVIDER: tplProvider,
+      TPL_DATE_1: tplDate1,
+      TPL_DATE_2: tplDate2,
+      TYPE_OF_FRANCHISE: typeOfFranchise,
+      KIND_OF_BUSINESS: kindOfBusiness,
+      TODA: toda,
+      DATE_RELEASE_OF_ST_TP: DateReleaseOfSTTP,
+      ROUTE: route,
+      REMARKS: remarks,
+      COMPLAINT: complaints,
+      isArchived: false,
+    });
+
+    res.status(201).json(newFranchise);
+  } catch (error) {
+    console.error("Error adding new franchise:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   getAllFranchise,
   getAllArchived,
   archiveFranchise,
   getAllAvailableMTOPs,
+  addNewFranchise,
 };

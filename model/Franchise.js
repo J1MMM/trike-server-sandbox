@@ -10,7 +10,7 @@ const franchiseSchema = new Schema({
     type: String,
     required: false,
   },
-  "FIRST NAME": {
+  FIRSTNAME: {
     type: String,
     required: false,
   },
@@ -22,35 +22,35 @@ const franchiseSchema = new Schema({
     type: String,
     required: false,
   },
-  "CONTACT NO.": {
+  DRIVER_NO: {
     type: String,
     required: false,
   },
-  "CONTACT NO.2": {
+  OWNER_NO: {
     type: String,
     required: false,
   },
-  "TO+C2+H1+H4": {
+  TODA: {
     type: String,
     required: false,
   },
-  "DRIVER'S NAME": {
+  DRIVERS_NAME: {
     type: String,
     required: false,
   },
-  "DRIVER'S ADDRESS": {
+  DRIVERS_ADDRESS: {
     type: String,
     required: false,
   },
-  "O.R.": {
+  OR: {
     type: String,
     required: false,
   },
-  "C.R.": {
+  CR: {
     type: String,
     required: false,
   },
-  "DRIVER'S LICENSE NO.": {
+  DRIVERS_LICENSE_NO: {
     type: String,
     required: false,
   },
@@ -58,15 +58,15 @@ const franchiseSchema = new Schema({
     type: String,
     required: false,
   },
-  "MOTOR NO": {
+  MOTOR_NO: {
     type: String,
     required: false,
   },
-  "CHASSIS NO": {
+  CHASSIS_NO: {
     type: String,
     required: false,
   },
-  "PLATE NO": {
+  PLATE_NO: {
     type: String,
     required: false,
   },
@@ -74,7 +74,23 @@ const franchiseSchema = new Schema({
     type: String,
     required: false,
   },
-  "DATE RENEWAL": {
+  FUEL_DISP: {
+    type: String,
+    required: false,
+  },
+  TPL_PROVIDER: {
+    type: String,
+    required: false,
+  },
+  TPL_DATE_1: {
+    type: "date",
+    required: false,
+  },
+  TPL_DATE_2: {
+    type: "date",
+    required: false,
+  },
+  DATE_RENEWAL: {
     type: "date",
     required: false,
   },
@@ -82,7 +98,19 @@ const franchiseSchema = new Schema({
     type: String,
     required: false,
   },
-  "DATE RELEASE OF ST/TP": {
+  DATE_RELEASE_OF_ST_TP: {
+    type: "date",
+    required: false,
+  },
+  TYPE_OF_FRANCHISE: {
+    type: String,
+    required: false,
+  },
+  KIND_OF_BUSINESS: {
+    type: String,
+    required: false,
+  },
+  ROUTE: {
     type: String,
     required: false,
   },
@@ -92,7 +120,8 @@ const franchiseSchema = new Schema({
   },
   isArchived: {
     type: Boolean,
-    required: false,
+    default: false,
+    required: true,
   },
 });
 
