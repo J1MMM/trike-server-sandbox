@@ -18,7 +18,7 @@ const getAllArchived = async (req, res) => {
   console.log("archive");
   try {
     const rows = await Franchise.find({ isArchived: true }).sort({
-      MTOP: "asc",
+      DATE_ARCHIVED: "desc",
     });
     const totalRows = await Franchise.countDocuments();
     res.json({ rows, totalRows });
@@ -30,11 +30,11 @@ const getAllArchived = async (req, res) => {
 
 const archiveFranchise = async (req, res) => {
   const { id } = req.body;
-
+  const datenow = new Date();
   try {
     const updatedFranchise = await Franchise.findByIdAndUpdate(
       id,
-      { isArchived: true },
+      { isArchived: true, DATE_ARCHIVED: datenow },
       { new: true } // To return the updated document
     );
 
@@ -79,102 +79,229 @@ const getAllAvailableMTOPs = async (req, res) => {
 
 const addNewFranchise = async (req, res) => {
   try {
-    const {
-      mtop,
-      dateRenewal,
-      ownerFname,
-      ownerLname,
-      ownerMI,
-      ownerAddress,
-      ownerContact,
-      driverFullname,
-      driverAddress,
-      driverContact,
-      model,
-      plateno,
-      motorno,
-      stroke,
-      chasisno,
-      fueldisp,
-      OR,
-      CR,
-      tplProvider,
-      tplDate1,
-      tplDate2,
-      typeOfFranchise,
-      kindOfBusiness,
-      toda,
-      route,
-      remarks,
-      complaints,
-      DateReleaseOfSTTP,
-    } = req.body;
-
+    const franchiseDetails = req.body;
+    console.log(req.body);
     if (
-      !mtop ||
-      !dateRenewal ||
-      !ownerFname ||
-      !ownerLname ||
-      !ownerAddress ||
-      !ownerContact ||
-      !driverFullname ||
-      !driverAddress ||
-      !driverContact ||
-      !model ||
-      !plateno ||
-      !motorno ||
-      !OR ||
-      !CR
+      !franchiseDetails.mtop ||
+      !franchiseDetails.date ||
+      !franchiseDetails.fname ||
+      !franchiseDetails.lname ||
+      !franchiseDetails.address ||
+      !franchiseDetails.contact ||
+      !franchiseDetails.drivername ||
+      !franchiseDetails.driveraddress ||
+      !franchiseDetails.model ||
+      !franchiseDetails.plateno ||
+      !franchiseDetails.motorno ||
+      !franchiseDetails.or ||
+      !franchiseDetails.cr
     ) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res
+        .status(400)
+        .json({ message: "Important franchise details are required." });
     }
     // Check if a document with the same MTOP already exists
     const existingFranchise = await Franchise.findOne({
-      MTOP: mtop,
+      MTOP: franchiseDetails.mtop,
       isArchived: false,
     });
 
     if (existingFranchise) {
-      return res.status(400).json({ error: "MTOP already exists" });
+      return res.status(400).json({ message: "MTOP already exists" });
     }
-
+    let expireDate = new Date(franchiseDetails.date);
+    expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
+    console.log(expireDate);
     // Create a new franchise document and save it to the database
     const newFranchise = await Franchise.create({
-      MTOP: mtop,
-      DATE_RENEWAL: dateRenewal,
-      FIRSTNAME: ownerFname,
-      LASTNAME: ownerLname,
-      MI: ownerMI,
-      ADDRESS: ownerAddress,
-      DRIVERS_NAME: driverFullname,
-      DRIVERS_ADDRESS: driverAddress,
-      OWNER_NO: ownerContact,
-      DRIVER_NO: driverContact,
-      MODEL: model,
-      PLATE_NO: plateno,
-      MOTOR_NO: motorno,
-      STROKE: stroke,
-      CHASSIS_NO: chasisno,
-      FUEL_DISP: fueldisp,
-      OR: OR,
-      CR: CR,
-      TPL_PROVIDER: tplProvider,
-      TPL_DATE_1: tplDate1,
-      TPL_DATE_2: tplDate2,
-      TYPE_OF_FRANCHISE: typeOfFranchise,
-      KIND_OF_BUSINESS: kindOfBusiness,
-      TODA: toda,
-      DATE_RELEASE_OF_ST_TP: DateReleaseOfSTTP,
-      ROUTE: route,
-      REMARKS: remarks,
-      COMPLAINT: complaints,
+      MTOP: franchiseDetails.mtop,
+      DATE_RENEWAL: franchiseDetails.date,
+      FIRSTNAME: franchiseDetails.fname,
+      LASTNAME: franchiseDetails.lname,
+      MI: franchiseDetails.mi,
+      ADDRESS: franchiseDetails.address,
+      OWNER_NO: franchiseDetails.contact,
+      OWNER_SEX: franchiseDetails.ownerSex,
+      DRIVERS_NAME: franchiseDetails.drivername,
+      DRIVERS_ADDRESS: franchiseDetails.driveraddress,
+      DRIVERS_NO: franchiseDetails.contact2,
+      DRIVERS_SEX: franchiseDetails.driverSex,
+      DRIVERS_LICENSE_NO: franchiseDetails.driverlicenseno,
+      MODEL: franchiseDetails.model,
+      PLATE_NO: franchiseDetails.plateno,
+      MOTOR_NO: franchiseDetails.motorno,
+      STROKE: franchiseDetails.stroke,
+      CHASSIS_NO: franchiseDetails.chassisno,
+      FUEL_DISP: franchiseDetails.fuelDisp,
+      OR: franchiseDetails.or,
+      CR: franchiseDetails.cr,
+      TPL_PROVIDER: franchiseDetails.tplProvider,
+      TPL_DATE_1: franchiseDetails.tplDate1,
+      TPL_DATE_2: franchiseDetails.tplDate2,
+      TYPE_OF_FRANCHISE: franchiseDetails.typeofFranchise,
+      KIND_OF_BUSINESS: franchiseDetails.kindofBusiness,
+      TODA: franchiseDetails.toda,
+      DATE_RELEASE_OF_ST_TP: franchiseDetails.daterelease,
+      ROUTE: franchiseDetails.route,
+      REMARKS: franchiseDetails.remarks,
       isArchived: false,
+      DATE_EXPIRED: expireDate,
     });
 
     res.status(201).json(newFranchise);
   } catch (error) {
     console.error("Error adding new franchise:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const handleFranchiseTransfer = async (req, res) => {
+  try {
+    console.log(req.body);
+    const franchiseDetails = req.body;
+    if (
+      !franchiseDetails.mtop ||
+      !franchiseDetails.date ||
+      !franchiseDetails.fname ||
+      !franchiseDetails.lname ||
+      !franchiseDetails.address ||
+      !franchiseDetails.contact ||
+      !franchiseDetails.drivername ||
+      !franchiseDetails.driveraddress ||
+      !franchiseDetails.model ||
+      !franchiseDetails.plateno ||
+      !franchiseDetails.motorno ||
+      !franchiseDetails.or ||
+      !franchiseDetails.cr
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Important franchise details are required." });
+    }
+    const datenow = new Date();
+    let expireDate = new Date(franchiseDetails.date);
+    expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
+
+    const updatedOldFranchise = await Franchise.findByIdAndUpdate(
+      franchiseDetails.id,
+      { isArchived: true, DATE_ARCHIVED: datenow },
+      { new: true }
+    );
+
+    const newFranchise = await Franchise.create({
+      MTOP: franchiseDetails.mtop,
+      DATE_RENEWAL: franchiseDetails.date,
+      FIRSTNAME: franchiseDetails.fname,
+      LASTNAME: franchiseDetails.lname,
+      MI: franchiseDetails.mi,
+      ADDRESS: franchiseDetails.address,
+      OWNER_NO: franchiseDetails.contact,
+      OWNER_SEX: franchiseDetails.ownerSex,
+      DRIVERS_NAME: franchiseDetails.drivername,
+      DRIVERS_ADDRESS: franchiseDetails.driveraddress,
+      DRIVERS_NO: franchiseDetails.contact2,
+      DRIVERS_SEX: franchiseDetails.driverSex,
+      DRIVERS_LICENSE_NO: franchiseDetails.driverlicenseno,
+      MODEL: franchiseDetails.model,
+      PLATE_NO: franchiseDetails.plateno,
+      MOTOR_NO: franchiseDetails.motorno,
+      STROKE: franchiseDetails.stroke,
+      CHASSIS_NO: franchiseDetails.chassisno,
+      FUEL_DISP: franchiseDetails.fuelDisp,
+      OR: franchiseDetails.or,
+      CR: franchiseDetails.cr,
+      TPL_PROVIDER: franchiseDetails.tplProvider,
+      TPL_DATE_1: franchiseDetails.tplDate1,
+      TPL_DATE_2: franchiseDetails.tplDate2,
+      TYPE_OF_FRANCHISE: franchiseDetails.typeofFranchise,
+      KIND_OF_BUSINESS: franchiseDetails.kindofBusiness,
+      TODA: franchiseDetails.toda,
+      DATE_RELEASE_OF_ST_TP: franchiseDetails.daterelease,
+      ROUTE: franchiseDetails.route,
+      REMARKS: franchiseDetails.remarks,
+      isArchived: false,
+      DATE_EXPIRED: expireDate,
+    });
+
+    res.status(201).json({
+      message: "Franchise transferred successfully",
+      newFranchise,
+      updatedOldFranchise,
+    });
+  } catch (error) {
+    console.error("Error transfering franchise:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const handleFranchiseUpdate = async (req, res) => {
+  try {
+    console.log(req.body);
+    const franchiseDetails = req.body;
+    if (
+      !franchiseDetails.mtop ||
+      !franchiseDetails.date ||
+      !franchiseDetails.fname ||
+      !franchiseDetails.lname ||
+      !franchiseDetails.address ||
+      !franchiseDetails.contact ||
+      !franchiseDetails.drivername ||
+      !franchiseDetails.driveraddress ||
+      !franchiseDetails.model ||
+      !franchiseDetails.plateno ||
+      !franchiseDetails.motorno ||
+      !franchiseDetails.or ||
+      !franchiseDetails.cr
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Important franchise details are required." });
+    }
+    let expireDate = new Date(franchiseDetails.date);
+    expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
+
+    const updatedFranchise = await Franchise.findByIdAndUpdate(
+      franchiseDetails.id,
+      {
+        DATE_RENEWAL: franchiseDetails.date,
+        FIRSTNAME: franchiseDetails.fname,
+        LASTNAME: franchiseDetails.lname,
+        MI: franchiseDetails.mi,
+        ADDRESS: franchiseDetails.address,
+        OWNER_NO: franchiseDetails.contact,
+        OWNER_SEX: franchiseDetails.ownerSex,
+        DRIVERS_NAME: franchiseDetails.drivername,
+        DRIVERS_ADDRESS: franchiseDetails.driveraddress,
+        DRIVERS_NO: franchiseDetails.contact2,
+        DRIVERS_SEX: franchiseDetails.driverSex,
+        DRIVERS_LICENSE_NO: franchiseDetails.driverlicenseno,
+        MODEL: franchiseDetails.model,
+        PLATE_NO: franchiseDetails.plateno,
+        MOTOR_NO: franchiseDetails.motorno,
+        STROKE: franchiseDetails.stroke,
+        CHASSIS_NO: franchiseDetails.chassisno,
+        FUEL_DISP: franchiseDetails.fuelDisp,
+        OR: franchiseDetails.or,
+        CR: franchiseDetails.cr,
+        TPL_PROVIDER: franchiseDetails.tplProvider,
+        TPL_DATE_1: franchiseDetails.tplDate1,
+        TPL_DATE_2: franchiseDetails.tplDate2,
+        TYPE_OF_FRANCHISE: franchiseDetails.typeofFranchise,
+        KIND_OF_BUSINESS: franchiseDetails.kindofBusiness,
+        TODA: franchiseDetails.toda,
+        DATE_RELEASE_OF_ST_TP: franchiseDetails.daterelease,
+        ROUTE: franchiseDetails.route,
+        REMARKS: franchiseDetails.remarks,
+        isArchived: false,
+        DATE_EXPIRED: expireDate,
+      },
+      { new: true }
+    );
+
+    res.status(201).json(updatedFranchise);
+  } catch (error) {
+    console.error("Error updating franchise:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -184,4 +311,6 @@ module.exports = {
   archiveFranchise,
   getAllAvailableMTOPs,
   addNewFranchise,
+  handleFranchiseTransfer,
+  handleFranchiseUpdate,
 };
