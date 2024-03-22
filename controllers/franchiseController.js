@@ -109,13 +109,14 @@ const addNewFranchise = async (req, res) => {
     if (existingFranchise) {
       return res.status(400).json({ message: "MTOP already exists" });
     }
+    const dateRenewal = new Date(franchiseDetails.date);
     let expireDate = new Date(franchiseDetails.date);
     expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
     console.log(expireDate);
     // Create a new franchise document and save it to the database
     const newFranchise = await Franchise.create({
       MTOP: franchiseDetails.mtop,
-      DATE_RENEWAL: franchiseDetails.date,
+      DATE_RENEWAL: dateRenewal,
       FIRSTNAME: franchiseDetails.fname,
       LASTNAME: franchiseDetails.lname,
       MI: franchiseDetails.mi,
@@ -179,6 +180,7 @@ const handleFranchiseTransfer = async (req, res) => {
         .json({ message: "Important franchise details are required." });
     }
     const datenow = new Date();
+    const dateRenewal = new Date(franchiseDetails.date);
     let expireDate = new Date(franchiseDetails.date);
     expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
 
@@ -190,7 +192,7 @@ const handleFranchiseTransfer = async (req, res) => {
 
     const newFranchise = await Franchise.create({
       MTOP: franchiseDetails.mtop,
-      DATE_RENEWAL: franchiseDetails.date,
+      DATE_RENEWAL: dateRenewal,
       FIRSTNAME: franchiseDetails.fname,
       LASTNAME: franchiseDetails.lname,
       MI: franchiseDetails.mi,
@@ -257,13 +259,15 @@ const handleFranchiseUpdate = async (req, res) => {
         .status(400)
         .json({ message: "Important franchise details are required." });
     }
+
+    const dateRenewal = new Date(franchiseDetails.date);
     let expireDate = new Date(franchiseDetails.date);
     expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
 
     const updatedFranchise = await Franchise.findByIdAndUpdate(
       franchiseDetails.id,
       {
-        DATE_RENEWAL: franchiseDetails.date,
+        DATE_RENEWAL: dateRenewal,
         FIRSTNAME: franchiseDetails.fname,
         LASTNAME: franchiseDetails.lname,
         MI: franchiseDetails.mi,
