@@ -22,11 +22,15 @@ const franchiseSchema = new Schema({
     type: String,
     required: false,
   },
-  DRIVER_NO: {
+  DRIVERS_NO: {
     type: String,
     required: false,
   },
   OWNER_NO: {
+    type: String,
+    required: false,
+  },
+  OWNER_SEX: {
     type: String,
     required: false,
   },
@@ -39,6 +43,10 @@ const franchiseSchema = new Schema({
     required: false,
   },
   DRIVERS_ADDRESS: {
+    type: String,
+    required: false,
+  },
+  DRIVERS_SEX: {
     type: String,
     required: false,
   },
@@ -90,10 +98,7 @@ const franchiseSchema = new Schema({
     type: "date",
     required: false,
   },
-  DATE_RENEWAL: {
-    type: "date",
-    required: false,
-  },
+
   REMARKS: {
     type: String,
     required: false,
@@ -122,6 +127,18 @@ const franchiseSchema = new Schema({
     type: Boolean,
     default: false,
     required: true,
+  },
+  DATE_ARCHIVED: {
+    type: "date",
+    required: false,
+  },
+  DATE_RENEWAL: {
+    type: "date",
+    required: false,
+  },
+  DATE_EXPIRED: {
+    type: "date",
+    required: false,
   },
 });
 

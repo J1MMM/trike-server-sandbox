@@ -6,6 +6,8 @@ const {
   archiveFranchise,
   getAllAvailableMTOPs,
   addNewFranchise,
+  handleFranchiseTransfer,
+  handleFranchiseUpdate,
 } = require("../../controllers/franchiseController");
 
 router
@@ -15,5 +17,7 @@ router
   .post(addNewFranchise);
 router.route("/archive").get(getAllArchived);
 router.route("/available").get(getAllAvailableMTOPs);
+router.route("/transfer").post(handleFranchiseTransfer);
+router.route("/update").post(handleFranchiseUpdate);
 
 module.exports = router;
