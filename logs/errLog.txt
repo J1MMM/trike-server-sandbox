@@ -17,3 +17,10 @@
 2024/03/11	09:25:20	cfdea6aa-4db1-437f-82df-2c253b335997	Error: Not allowed by CORS
 2024/03/11	09:41:06	34e1392f-ccb8-4581-b40c-8c116127b6aa	Error: Not allowed by CORS
 2024/03/13	07:38:23	93c545e8-a1f0-4cb6-8c24-c63decef7353	SyntaxError: Expected property name or '}' in JSON at position 4
+2024/03/29	07:45:47	9cf17b3e-e1d8-4349-8711-73d6efc844ad	Error: Not allowed by CORS
+2024/03/29	07:45:47	e105d58f-cffb-4b82-b031-07eb8504d876	Error: Not allowed by CORS
+2024/03/29	07:45:47	f0a6e7f3-7a1c-4856-9b44-f77e359895d4	Error: Not allowed by CORS
+2024/03/29	07:45:47	777a0157-3c73-4724-8ed0-e0f5fd6a49ca	Error: Not allowed by CORS
+2024/03/29	07:45:47	a178249c-12eb-42cc-9bdb-9be20d17f339	Error: Not allowed by CORS
+2024/03/29	07:49:08	30f18a8e-02d0-4f4f-aeef-cd3b62a3f11f	Error: Not allowed by CORS
+2024/03/29	07:49:19	3b2a722f-8b15-420a-ab38-f6a13de308ba	Error: Not allowed by CORS
