@@ -11,7 +11,7 @@ const violationSchema = new Schema({
     required: true,
   },
   confiscatedDL: {
-    type: Boolean,
+    type: String,
     required: false,
   },
   name: {
@@ -42,12 +42,8 @@ const violationSchema = new Schema({
     type: String,
     required: false,
   },
-  violations: {
+  violation: {
     type: Array,
-    required: false,
-  },
-  paid: {
-    type: Boolean,
     required: false,
   },
 
@@ -69,6 +65,10 @@ const violationSchema = new Schema({
   },
   timeViolation: {
     type: String,
+    required: false,
+  },
+  paid: {
+    type: Boolean,
     required: false,
   },
 });

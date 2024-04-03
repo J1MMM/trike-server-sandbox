@@ -10,6 +10,7 @@ const ROLES_LIST = require("../config/roles_list");
 const Officer = require("../model/Officer");
 const ViolationList = require("../model/ViolationList");
 const Violation = require("../model/Violation");
+const Franchise = require("../model/Franchise");
 
 const getViolationList = async (req, res) => {
   try {
@@ -36,9 +37,34 @@ const getViolations = async (req, res) => {
 const addViolator = async (req, res) => {
   try {
     const violationrDetails = req.body;
+    console.log(violationrDetails);
     if (!violationrDetails) return res.sendStatus(400);
 
-    const newViolator = await Violation.create(violationrDetails);
+    const newViolator = await Violation.create({
+      ...violationrDetails,
+      officer: violationrDetails?.officer.fullname,
+    });
+
+    await Officer.findByIdAndUpdate(violationrDetails?.officer.id, {
+      $inc: { apprehended: 1 },
+    });
+    const foundFranchise = await Franchise.findOne({
+      MTOP: violationrDetails.franchiseNo,
+    });
+    if (foundFranchise) {
+      if (typeof foundFranchise.COMPLAINT[0] == "object") {
+        foundFranchise.COMPLAINT = [
+          ...foundFranchise.COMPLAINT,
+          ...violationrDetails.violation,
+        ];
+      }
+
+      if (typeof foundFranchise.COMPLAINT[0] == "string") {
+        foundFranchise.COMPLAINT = [...violationrDetails.violation];
+      }
+
+      foundFranchise.save();
+    }
 
     res.status(201).json(newViolator);
   } catch (error) {
