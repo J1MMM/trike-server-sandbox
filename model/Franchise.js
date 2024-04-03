@@ -120,7 +120,7 @@ const franchiseSchema = new Schema({
     required: false,
   },
   COMPLAINT: {
-    type: String,
+    type: Array,
     required: false,
   },
   isArchived: {
