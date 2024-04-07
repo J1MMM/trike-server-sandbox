@@ -9,19 +9,26 @@ const officerSchema = new Schema({
     type: String,
     required: true,
   },
+
   firstname: {
     type: String,
     required: true,
   },
+
   lastname: {
     type: String,
     required: true,
   },
-  mi: String,
-  password: {
+  mi: {
     type: String,
     required: false,
   },
+
+  fullname: {
+    type: String,
+    required: false,
+  },
+
   apprehended: {
     type: Number,
     required: true,

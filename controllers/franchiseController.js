@@ -1,7 +1,6 @@
 const Franchise = require("../model/Franchise");
 
 const getAllFranchise = async (req, res) => {
-  console.log("not archive");
   try {
     const rows = await Franchise.find({ isArchived: false }).sort({
       MTOP: "asc",
@@ -15,7 +14,6 @@ const getAllFranchise = async (req, res) => {
 };
 
 const getAllArchived = async (req, res) => {
-  console.log("archive");
   try {
     const rows = await Franchise.find({ isArchived: true }).sort({
       DATE_ARCHIVED: "desc",
@@ -61,9 +59,6 @@ const getAllAvailableMTOPs = async (req, res) => {
       String(index + 1).padStart(4, "0")
     );
 
-    console.log(usedFranchises.length);
-    console.log(allMTOPs.length);
-
     // Find the missing MTOP numbers by filtering out the used MTOP numbers
     const missingMTOPs = allMTOPs.filter(
       (MTOP) => !usedFranchises.includes(MTOP)
@@ -80,7 +75,6 @@ const getAllAvailableMTOPs = async (req, res) => {
 const addNewFranchise = async (req, res) => {
   try {
     const franchiseDetails = req.body;
-    console.log(req.body);
     if (
       !franchiseDetails.mtop ||
       !franchiseDetails.date ||
@@ -112,7 +106,6 @@ const addNewFranchise = async (req, res) => {
     const dateRenewal = new Date(franchiseDetails.date);
     let expireDate = new Date(franchiseDetails.date);
     expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
-    console.log(expireDate);
     // Create a new franchise document and save it to the database
     const newFranchise = await Franchise.create({
       MTOP: franchiseDetails.mtop,
@@ -158,7 +151,6 @@ const addNewFranchise = async (req, res) => {
 
 const handleFranchiseTransfer = async (req, res) => {
   try {
-    console.log(req.body);
     const franchiseDetails = req.body;
     if (
       !franchiseDetails.mtop ||
@@ -238,7 +230,6 @@ const handleFranchiseTransfer = async (req, res) => {
 
 const handleFranchiseUpdate = async (req, res) => {
   try {
-    console.log(req.body);
     const franchiseDetails = req.body;
     if (
       !franchiseDetails.mtop ||

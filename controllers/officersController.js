@@ -16,6 +16,17 @@ const getAllOfficer = async (req, res) => {
       callsign: "asc",
     });
     if (!result) return res.status(204).json({ message: "No Officers found" });
+
+    // result = await Promise.all(
+    //   result.map(async (officer) => {
+    //     officer.fullname = `${officer.firstname} ${
+    //       officer?.mi && officer?.mi + " "
+    //     }${officer.lastname}`;
+    //     await officer.save();
+    //     return officer;
+    //   })
+    // );
+
     res.json(result);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -37,6 +48,9 @@ const addOfficer = async (req, res) => {
       firstname: officerDetails.firstname,
       lastname: officerDetails.lastname,
       mi: officerDetails.mi,
+      fullname: `${officerDetails.firstname} ${
+        officerDetails.mi && officerDetails.mi + " "
+      }${officerDetails.lastname}`,
     });
 
     res.status(201).json(newOfficer);
@@ -58,6 +72,9 @@ const updateOfficer = async (req, res) => {
         firstname: officerInfo.firstname,
         lastname: officerInfo.lastname,
         mi: officerInfo.mi,
+        fullname: `${officerInfo.firstname} ${
+          officerInfo.mi && officerInfo.mi + " "
+        }${officerInfo.lastname}`,
       },
       { new: true }
     );
