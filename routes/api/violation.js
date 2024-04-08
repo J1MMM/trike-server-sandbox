@@ -5,10 +5,11 @@ const {
   getViolationList,
   addViolator,
   getViolations,
+  updateViolation,
 } = require("../../controllers/violationController");
 const router = express.Router();
 
-router.route("/").get(getViolations).post(addViolator);
+router.route("/").get(getViolations).post(addViolator).put(updateViolation);
 router.route("/list").get(getViolationList);
 
 module.exports = router;
