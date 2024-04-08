@@ -64,21 +64,20 @@ const updateOfficer = async (req, res) => {
   try {
     const officerInfo = req.body;
     if (!officerInfo) return res.sendStatus(400);
-
     const updatedOfficer = await Officer.findByIdAndUpdate(
-      officerInfo.id,
+      officerInfo._id,
       {
         callsign: officerInfo.callsign,
         firstname: officerInfo.firstname,
         lastname: officerInfo.lastname,
         mi: officerInfo.mi,
         fullname: `${officerInfo.firstname} ${
-          officerInfo.mi && officerInfo.mi + " "
-        }${officerInfo.lastname}`,
+          officerInfo.mi ? officerInfo.mi + " " : ""
+        }${officerInfo.lastname}`, // Corrected the ternary operator
       },
       { new: true }
     );
-
+    console.log(updatedOfficer); // Corrected variable name for logging
     res.status(201).json(updatedOfficer);
   } catch (error) {
     console.log(error);
@@ -87,7 +86,6 @@ const updateOfficer = async (req, res) => {
 };
 
 const deleteOfficer = async (req, res) => {
-  console.log(req.body.id);
   if (!req.body.id) return res.sendStatus(400);
   try {
     await Officer.deleteOne({ _id: req.body.id });

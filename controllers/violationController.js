@@ -58,6 +58,7 @@ const addViolator = async (req, res) => {
         $inc: { apprehended: 1 },
       }
     );
+
     if (violationDetails.franchiseNo) {
       const violations = violationDetails.violation.map((obj) => obj.violation);
 
@@ -79,11 +80,6 @@ const addViolator = async (req, res) => {
           });
         }
         foundFranchise.COMPLAINT = allViolations;
-        if (allViolations.length > 4) {
-          const dateNow = new Date();
-          foundFranchise.DATE_ARCHIVED = dateNow;
-          foundFranchise.isArchived = true;
-        }
         foundFranchise.save();
       }
     }
@@ -113,74 +109,75 @@ const updateViolation = async (req, res) => {
         { $inc: { apprehended: -1 } }
       );
     }
+    /////////////////////////////
+    // const oldViolations = oldRecord.violation.map((obj) => obj.violation);
+    // let violations = violationDetails.violation.map((obj) => obj.violation);
+    // const containsOthers = violations.find((v) => v == "OTHERS");
+    // if (containsOthers) {
+    //   violations = violations.map((violation) => {
+    //     if (violation == "OTHERS") {
+    //       return violationDetails.remarks;
+    //     } else {
+    //       return violation;
+    //     }
+    //   });
+    // }
 
-    const oldViolations = oldRecord.violation.map((obj) => obj.violation);
-    let violations = violationDetails.violation.map((obj) => obj.violation);
-    const containsOthers = violations.find((v) => v == "OTHERS");
-    if (containsOthers) {
-      violations = violations.map((violation) => {
-        if (violation == "OTHERS") {
-          return violationDetails.remarks;
-        } else {
-          return violation;
-        }
-      });
-    }
+    // if (violationDetails.franchiseNo) {
+    //   if (violationDetails.franchiseNo == oldRecord.franchiseNo) {
+    //     const franchise = await Franchise.findOne({
+    //       MTOP: violationDetails.franchiseNo,
+    //       isArchived: false,
+    //     });
+    //     if (franchise) {
+    //       const newArr = franchise.COMPLAINT.filter(
+    //         (item) => !oldViolations.includes(item)
+    //       );
+    //       const mergeArr = [...newArr, ...violations];
+    //       franchise.COMPLAINT = mergeArr;
+    //       franchise.save();
+    //     }
+    //   }
+    //   if (violationDetails.franchiseNo != oldRecord.franchiseNo) {
+    //     const newFranchise = await Franchise.findOne({
+    //       MTOP: violationDetails.franchiseNo,
+    //       isArchived: false,
+    //     });
 
-    if (violationDetails.franchiseNo) {
-      if (violationDetails.franchiseNo == oldRecord.franchiseNo) {
-        const franchise = await Franchise.findOne({
-          MTOP: violationDetails.franchiseNo,
-          isArchived: false,
-        });
-        if (franchise) {
-          const newArr = franchise.COMPLAINT.filter(
-            (item) => !oldViolations.includes(item)
-          );
-          const mergeArr = [...newArr, ...violations];
-          franchise.COMPLAINT = mergeArr;
-          franchise.save();
-        }
-      }
-      if (violationDetails.franchiseNo != oldRecord.franchiseNo) {
-        const newFranchise = await Franchise.findOne({
-          MTOP: violationDetails.franchiseNo,
-          isArchived: false,
-        });
+    //     if (newFranchise) {
+    //       newFranchise.COMPLAINT = [...newFranchise.COMPLAINT, ...violations];
+    //       newFranchise.save();
+    //     }
 
-        if (newFranchise) {
-          newFranchise.COMPLAINT = [...newFranchise.COMPLAINT, ...violations];
-          newFranchise.save();
-        }
+    //     const oldFranchise = await Franchise.findOne({
+    //       MTOP: oldRecord.franchiseNo,
+    //       isArchived: false,
+    //     });
 
-        const oldFranchise = await Franchise.findOne({
-          MTOP: oldRecord.franchiseNo,
-          isArchived: false,
-        });
+    //     if (oldFranchise) {
+    //       oldFranchise.COMPLAINT = oldFranchise.COMPLAINT.filter(
+    //         (item) => !oldViolations.includes(item)
+    //       );
+    //       oldFranchise.save();
+    //     }
+    //   }
+    // }
 
-        if (oldFranchise) {
-          oldFranchise.COMPLAINT = oldFranchise.COMPLAINT.filter(
-            (item) => !oldViolations.includes(item)
-          );
-          oldFranchise.save();
-        }
-      }
-    }
+    // if (!violationDetails.franchiseNo && oldRecord.franchiseNo) {
+    //   const franchiseRecord = await Franchise.findOne({
+    //     MTOP: oldRecord.franchiseNo,
+    //     isArchived: false,
+    //   });
 
-    if (!violationDetails.franchiseNo && oldRecord.franchiseNo) {
-      const franchiseRecord = await Franchise.findOne({
-        MTOP: oldRecord.franchiseNo,
-        isArchived: false,
-      });
+    //   if (franchiseRecord) {
+    //     franchiseRecord.COMPLAINT = franchiseRecord.COMPLAINT.filter(
+    //       (item) => !oldViolations.includes(item)
+    //     );
+    //     franchiseRecord.save();
+    //   }
+    // }
 
-      if (franchiseRecord) {
-        franchiseRecord.COMPLAINT = franchiseRecord.COMPLAINT.filter(
-          (item) => !oldViolations.includes(item)
-        );
-        franchiseRecord.save();
-      }
-    }
-
+    /////////////////////////////
     oldRecord.set(violationDetails);
     await oldRecord.save();
 
