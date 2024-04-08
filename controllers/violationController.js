@@ -114,8 +114,18 @@ const updateViolation = async (req, res) => {
       );
     }
 
-    const violations = violationDetails.violation.map((obj) => obj.violation);
     const oldViolations = oldRecord.violation.map((obj) => obj.violation);
+    let violations = violationDetails.violation.map((obj) => obj.violation);
+    const containsOthers = violations.find((v) => v == "OTHERS");
+    if (containsOthers) {
+      violations = violations.map((violation) => {
+        if (violation == "OTHERS") {
+          return violationDetails.remarks;
+        } else {
+          return violation;
+        }
+      });
+    }
 
     if (violationDetails.franchiseNo) {
       if (violationDetails.franchiseNo == oldRecord.franchiseNo) {
