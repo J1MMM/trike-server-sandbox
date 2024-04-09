@@ -86,6 +86,7 @@ const updateOfficer = async (req, res) => {
 };
 
 const deleteOfficer = async (req, res) => {
+  console.log(req.body.id);
   if (!req.body.id) return res.sendStatus(400);
   try {
     await Officer.deleteOne({ _id: req.body.id });
