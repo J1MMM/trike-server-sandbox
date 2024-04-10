@@ -12,6 +12,25 @@ const ViolationList = require("../model/ViolationList");
 const Violation = require("../model/Violation");
 const Franchise = require("../model/Franchise");
 
+const computeTotalPrice = (array) => {
+  return array.reduce((total, obj) => total + obj?.price, 0);
+};
+
+function removeOneItemPerMatch(array1, array2) {
+  // Iterate over each item in array1
+  array1.forEach((item) => {
+    // Find the index of the first occurrence of the item in array2
+    const index = array2.findIndex((item2) => item2 === item);
+    // If a matching item is found, remove it from array2
+    if (index !== -1) {
+      array2.splice(index, 1);
+    }
+  });
+
+  // Return the modified array2
+  return array2;
+}
+
 function arraysEqual(arr1, arr2) {
   if (arr1.length !== arr2.length) {
     return false;
@@ -50,6 +69,9 @@ const addViolator = async (req, res) => {
     const violationDetails = req.body;
     if (!violationDetails) return res.sendStatus(400);
 
+    const totalPrice = computeTotalPrice(violationDetails?.violation);
+    violationDetails.amount = parseInt(totalPrice);
+
     const newViolator = await Violation.create(violationDetails);
 
     await Officer.findOneAndUpdate(
@@ -60,7 +82,7 @@ const addViolator = async (req, res) => {
     );
 
     if (violationDetails.franchiseNo) {
-      const violations = violationDetails.violation.map((obj) => obj.violation);
+      let violations = violationDetails.violation.map((obj) => obj.violation);
 
       const foundFranchise = await Franchise.findOne({
         MTOP: violationDetails.franchiseNo,
@@ -68,17 +90,19 @@ const addViolator = async (req, res) => {
       });
 
       if (foundFranchise) {
-        let allViolations = [...foundFranchise.COMPLAINT, ...violations];
-        const containsOthers = allViolations.find((v) => v == "OTHERS");
+        const containsOthers = violations.find((v) => v == "OTHERS");
+
         if (containsOthers) {
-          allViolations = allViolations.map((violation) => {
+          violations = violations.map((violation) => {
             if (violation == "OTHERS") {
-              return violationDetails.remarks;
+              return violationDetails.others || "OTHERS";
             } else {
               return violation;
             }
           });
         }
+
+        const allViolations = [...foundFranchise.COMPLAINT, ...violations];
         foundFranchise.COMPLAINT = allViolations;
         foundFranchise.save();
       }
@@ -96,92 +120,117 @@ const updateViolation = async (req, res) => {
     const violationDetails = req.body;
     if (!violationDetails) return res.sendStatus(400);
 
-    const oldRecord = await Violation.findById(violationDetails._id);
-    if (!oldRecord) return res.sendStatus(400);
+    const prevViolationDetails = await Violation.findById(violationDetails._id);
+    if (!prevViolationDetails) return res.sendStatus(400);
 
-    if (oldRecord.officer != violationDetails?.officer) {
+    if (prevViolationDetails.officer != violationDetails?.officer) {
       await Officer.findOneAndUpdate(
         { fullname: violationDetails?.officer },
         { $inc: { apprehended: 1 } }
       );
       await Officer.findOneAndUpdate(
-        { fullname: oldRecord.officer },
+        { fullname: prevViolationDetails.officer },
         { $inc: { apprehended: -1 } }
       );
     }
-    /////////////////////////////
-    // const oldViolations = oldRecord.violation.map((obj) => obj.violation);
-    // let violations = violationDetails.violation.map((obj) => obj.violation);
-    // const containsOthers = violations.find((v) => v == "OTHERS");
-    // if (containsOthers) {
-    //   violations = violations.map((violation) => {
-    //     if (violation == "OTHERS") {
-    //       return violationDetails.remarks;
-    //     } else {
-    //       return violation;
-    //     }
-    //   });
-    // }
 
-    // if (violationDetails.franchiseNo) {
-    //   if (violationDetails.franchiseNo == oldRecord.franchiseNo) {
-    //     const franchise = await Franchise.findOne({
-    //       MTOP: violationDetails.franchiseNo,
-    //       isArchived: false,
-    //     });
-    //     if (franchise) {
-    //       const newArr = franchise.COMPLAINT.filter(
-    //         (item) => !oldViolations.includes(item)
-    //       );
-    //       const mergeArr = [...newArr, ...violations];
-    //       franchise.COMPLAINT = mergeArr;
-    //       franchise.save();
-    //     }
-    //   }
-    //   if (violationDetails.franchiseNo != oldRecord.franchiseNo) {
-    //     const newFranchise = await Franchise.findOne({
-    //       MTOP: violationDetails.franchiseNo,
-    //       isArchived: false,
-    //     });
+    const prevFranchise = await Franchise.findOne({
+      MTOP: prevViolationDetails.franchiseNo,
+      isArchived: false,
+    });
 
-    //     if (newFranchise) {
-    //       newFranchise.COMPLAINT = [...newFranchise.COMPLAINT, ...violations];
-    //       newFranchise.save();
-    //     }
+    const newFranchise = await Franchise.findOne({
+      MTOP: violationDetails.franchiseNo,
+      isArchived: false,
+    });
 
-    //     const oldFranchise = await Franchise.findOne({
-    //       MTOP: oldRecord.franchiseNo,
-    //       isArchived: false,
-    //     });
+    let violations = violationDetails.violation?.map((obj) => obj.violation);
+    let prevViolations = prevViolationDetails.violation?.map(
+      (obj) => obj.violation
+    );
 
-    //     if (oldFranchise) {
-    //       oldFranchise.COMPLAINT = oldFranchise.COMPLAINT.filter(
-    //         (item) => !oldViolations.includes(item)
-    //       );
-    //       oldFranchise.save();
-    //     }
-    //   }
-    // }
+    if (violations?.length > 0) {
+      const containsOthers = violations.find((v) => v == "OTHERS");
 
-    // if (!violationDetails.franchiseNo && oldRecord.franchiseNo) {
-    //   const franchiseRecord = await Franchise.findOne({
-    //     MTOP: oldRecord.franchiseNo,
-    //     isArchived: false,
-    //   });
+      if (containsOthers) {
+        violations = violations.map((violation) => {
+          if (violation == "OTHERS") {
+            return violationDetails.others || "OTHERS";
+          } else {
+            return violation;
+          }
+        });
+      }
+    }
 
-    //   if (franchiseRecord) {
-    //     franchiseRecord.COMPLAINT = franchiseRecord.COMPLAINT.filter(
-    //       (item) => !oldViolations.includes(item)
-    //     );
-    //     franchiseRecord.save();
-    //   }
-    // }
+    if (prevViolations?.length > 0) {
+      const containsOthers = prevViolations.find((v) => v == "OTHERS");
 
-    /////////////////////////////
-    oldRecord.set(violationDetails);
-    await oldRecord.save();
+      if (containsOthers) {
+        prevViolations = prevViolations.map((violation) => {
+          if (violation == "OTHERS") {
+            return prevViolationDetails.others || "OTHERS";
+          } else {
+            return violation;
+          }
+        });
+      }
+    }
 
-    res.status(201).json(oldRecord);
+    //check if franchises exist sometimes it already on archive
+    if (violationDetails?.franchiseNo) {
+      // if franchise number is exist
+      console.log("have franchice");
+      if (prevViolationDetails.franchiseNo) {
+        // if the franchise number of prev violation details is exist
+        if (prevViolationDetails.franchiseNo != violationDetails?.franchiseNo) {
+          // if franchise number is changed
+          console.log("franchise number changed");
+          prevFranchise.COMPLAINT = removeOneItemPerMatch(
+            prevViolations,
+            prevFranchise.COMPLAINT
+          );
+          newFranchise.COMPLAINT = [...newFranchise.COMPLAINT, ...violations];
+        } else {
+          console.log("franchise number same as old");
+          // if franchiseNo is same as old violationDetails
+          const updatedComplaints = removeOneItemPerMatch(
+            prevViolations,
+            newFranchise.COMPLAINT
+          ); // remove old violations from franchise complaints field
+
+          newFranchise.COMPLAINT = [...updatedComplaints, ...violations]; // merge violations to franchise complaints field
+        }
+      } else {
+        // if old violation details have'nt franchise number then new updated had
+        console.log("old record have'nt franchise number then now it have");
+
+        newFranchise.COMPLAINT = [...newFranchise.COMPLAINT, ...violations];
+      }
+    } else {
+      // if franchise number is remove
+      // if franchise number is remove then the old violationDetails have a franchise number it will remove it the the franchise that has this mtop
+      // If there is no franchise number now and the old violationDetails also do not have a franchise number, then no method will be executed.
+      if (prevViolationDetails.franchiseNo) {
+        console.log(
+          "franchise now have not franchise number but old record had"
+        );
+
+        prevFranchise.COMPLAINT = removeOneItemPerMatch(
+          prevViolations,
+          prevFranchise.COMPLAINT
+        );
+      }
+    }
+
+    if (newFranchise) await newFranchise.save();
+    if (prevFranchise) await prevFranchise.save();
+    console.log("====================================================");
+
+    await prevViolationDetails.set(violationDetails);
+    await prevViolationDetails.save();
+
+    res.status(201).json(prevViolationDetails);
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });

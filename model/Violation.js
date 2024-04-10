@@ -52,7 +52,7 @@ const violationSchema = new Schema({
     required: false,
   },
   amount: {
-    type: String,
+    type: Number,
     required: false,
   },
   or: {
@@ -69,6 +69,10 @@ const violationSchema = new Schema({
   },
   paid: {
     type: Boolean,
+    required: false,
+  },
+  others: {
+    type: String,
     required: false,
   },
 });
