@@ -91,11 +91,11 @@ const franchiseSchema = new Schema({
     required: false,
   },
   TPL_DATE_1: {
-    type: "date",
+    type: String,
     required: false,
   },
   TPL_DATE_2: {
-    type: "date",
+    type: String,
     required: false,
   },
 
@@ -104,7 +104,7 @@ const franchiseSchema = new Schema({
     required: false,
   },
   DATE_RELEASE_OF_ST_TP: {
-    type: "date",
+    type: String,
     required: false,
   },
   TYPE_OF_FRANCHISE: {
@@ -129,15 +129,15 @@ const franchiseSchema = new Schema({
     required: true,
   },
   DATE_ARCHIVED: {
-    type: "date",
+    type: String,
     required: false,
   },
   DATE_RENEWAL: {
-    type: "date",
+    type: String,
     required: false,
   },
   DATE_EXPIRED: {
-    type: "date",
+    type: String,
     required: false,
   },
 });

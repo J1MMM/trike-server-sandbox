@@ -75,6 +75,18 @@ const violationSchema = new Schema({
     type: String,
     required: false,
   },
+  payor: {
+    type: String,
+    required: false,
+  },
+  receiptNo: {
+    type: String,
+    required: false,
+  },
+  datePaid: {
+    type: String,
+    required: false,
+  },
 });
 
 module.exports = mongoose.model("Violation", violationSchema);

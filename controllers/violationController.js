@@ -55,7 +55,7 @@ const getViolationList = async (req, res) => {
 
 const getViolations = async (req, res) => {
   try {
-    const result = await Violation.find().sort({ _id: "desc" });
+    const result = await Violation.find({ paid: false }).sort({ _id: "desc" });
 
     if (!result) return res.status(204).json({ message: "Empty List" });
     res.json(result);
@@ -237,9 +237,65 @@ const updateViolation = async (req, res) => {
   }
 };
 
+const getViolationsPaid = async (req, res) => {
+  try {
+    const result = await Violation.find({ paid: true }).sort({ _id: "desc" });
+
+    if (!result) return res.status(204).json({ message: "Empty List" });
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const updateViolationPaidStatus = async (req, res) => {
+  try {
+    const violationDetails = req.body;
+    if (!violationDetails) return res.sendStatus(400);
+
+    let latestReceiptNo = await Violation.find()
+      .sort({ receiptNo: -1 })
+      .limit(1)
+      .select("receiptNo");
+
+    console.log(latestReceiptNo);
+    if (latestReceiptNo.length > 0) {
+      latestReceiptNo = latestReceiptNo[0].receiptNo;
+
+      if (latestReceiptNo == "") {
+        latestReceiptNo = "0000001";
+      } else {
+        const receiptNumber = parseInt(latestReceiptNo, 10);
+        latestReceiptNo = (receiptNumber + 1).toString().padStart(7, "0");
+      }
+    }
+
+    const datenow = new Date();
+    const updatedViolation = await Violation.findByIdAndUpdate(
+      violationDetails._id,
+      {
+        paid: true,
+        or: violationDetails.or,
+        orDate: violationDetails.orDate,
+        receiptNo: latestReceiptNo,
+        datePaid: datenow,
+        payor: violationDetails.payor,
+        remarks: violationDetails.remarks,
+      },
+      { new: true }
+    );
+    if (!updatedViolation) return res.sendStatus(400);
+    res.json(latestReceiptNo);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getViolationList,
   addViolator,
   getViolations,
   updateViolation,
+  getViolationsPaid,
+  updateViolationPaidStatus,
 };

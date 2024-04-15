@@ -6,10 +6,20 @@ const {
   addViolator,
   getViolations,
   updateViolation,
+  getViolationsPaid,
+  updateViolationPaidStatus,
 } = require("../../controllers/violationController");
 const router = express.Router();
 
-router.route("/").get(getViolations).post(addViolator).put(updateViolation);
+router
+  .route("/")
+  .get(getViolations)
+  .post(addViolator)
+  .put(updateViolation)
+  .patch(updateViolationPaidStatus);
+
 router.route("/list").get(getViolationList);
+
+router.route("/paid").get(getViolationsPaid);
 
 module.exports = router;
