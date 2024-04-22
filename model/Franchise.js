@@ -128,16 +128,30 @@ const franchiseSchema = new Schema({
     default: false,
     required: true,
   },
-  DATE_ARCHIVED: {
-    type: String,
+
+  PAID_VIOLATIONS: {
+    type: Array,
     required: false,
   },
+
   DATE_RENEWAL: {
-    type: String,
+    type: "date",
     required: false,
   },
   DATE_EXPIRED: {
-    type: String,
+    type: "date",
+    required: false,
+  },
+  createdAt: {
+    type: "date",
+    require: true,
+  },
+  renewedAt: {
+    type: "date",
+    require: false,
+  },
+  DATE_ARCHIVED: {
+    type: "date",
     required: false,
   },
 });

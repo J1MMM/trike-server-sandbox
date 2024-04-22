@@ -95,7 +95,7 @@ const addViolator = async (req, res) => {
         if (containsOthers) {
           violations = violations.map((violation) => {
             if (violation == "OTHERS") {
-              return violationDetails.others || "OTHERS";
+              return `${violationDetails.others} (OTHERS)` || "OTHERS";
             } else {
               return violation;
             }
@@ -155,7 +155,7 @@ const updateViolation = async (req, res) => {
       if (containsOthers) {
         violations = violations.map((violation) => {
           if (violation == "OTHERS") {
-            return violationDetails.others || "OTHERS";
+            return `${violationDetails.others} (OTHERS)` || "OTHERS";
           } else {
             return violation;
           }
@@ -169,7 +169,7 @@ const updateViolation = async (req, res) => {
       if (containsOthers) {
         prevViolations = prevViolations.map((violation) => {
           if (violation == "OTHERS") {
-            return prevViolationDetails.others || "OTHERS";
+            return `${prevViolationDetails.others} (OTHERS)` || "OTHERS";
           } else {
             return violation;
           }
@@ -271,8 +271,39 @@ const updateViolationPaidStatus = async (req, res) => {
     }
 
     const datenow = new Date();
-    const updatedViolation = await Violation.findByIdAndUpdate(
-      violationDetails._id,
+
+    if (violationDetails.franchiseNo) {
+      let violations = violationDetails.violation?.map((obj) => obj.violation);
+
+      if (violations?.length > 0) {
+        const containsOthers = violations.find((v) => v == "OTHERS");
+
+        if (containsOthers) {
+          violations = violations.map((violation) => {
+            if (violation == "OTHERS") {
+              return `${violationDetails.others} (OTHERS)` || "OTHERS";
+            } else {
+              return violation;
+            }
+          });
+        }
+      }
+
+      const foundFranchise = await Franchise.findOne({
+        MTOP: violationDetails.franchiseNo,
+        isArchived: false,
+      });
+
+      if (foundFranchise) {
+        foundFranchise.PAID_VIOLATIONS = [
+          ...foundFranchise.PAID_VIOLATIONS,
+          ...violations,
+        ];
+        await foundFranchise.save();
+      }
+    }
+    const updatedViolation = await Violation.findOneAndUpdate(
+      { _id: violationDetails._id, paid: false },
       {
         paid: true,
         or: violationDetails.or,

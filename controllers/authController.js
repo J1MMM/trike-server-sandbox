@@ -33,7 +33,7 @@ const handleLogin = async (req, res) => {
 
     // if user allreafy login
     const rToken = foundUser.refreshToken;
-    if (rToken) {
+    if (rToken != "") {
       res.cookie("jwt", rToken, {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
