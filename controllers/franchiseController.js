@@ -1,5 +1,47 @@
 const Franchise = require("../model/Franchise");
 
+function getStartOfCurrentWeek() {
+  let currentDate = new Date();
+  let diff = currentDate.getDate() - 6; // Adjust 6 days ago
+  return new Date(currentDate.setDate(diff)).setHours(0, 0, 0, 0);
+}
+
+function getEndOfCurrentWeek() {
+  let currentDate = new Date();
+  currentDate.setHours(23, 59, 59, 999);
+  return currentDate;
+}
+
+function mergeArrays(arr1, arr2, arr3) {
+  const arr7length = Array.from({ length: 7 }, () => null);
+  const mergedArray = [];
+
+  arr7length.map((v, index) => {
+    const revokedObj = arr1.find((v) => v._id == index + 1);
+    const addedObj = arr2.find((v) => v._id == index + 1);
+    const renewedObj = arr3.find((v) => v._id == index + 1);
+
+    mergedArray.push({
+      _id: index + 1,
+      added: addedObj?.added || 0,
+      renewed: renewedObj?.renewed || 0,
+      revoked: revokedObj?.revoked || 0,
+    });
+  });
+
+  return mergedArray;
+}
+function sortAndRotateArray(array, currentDayOfWeek) {
+  // Sort the array based on the _id field (day of the week)
+  const sortedArray = array.sort((a, b) => a._id - b._id);
+  const rotateArray = (arr, rotations) => {
+    return [...arr.slice(rotations), ...arr.slice(0, rotations)];
+  };
+
+  const result = rotateArray(sortedArray, currentDayOfWeek + 1);
+  return result;
+}
+
 const getAllFranchise = async (req, res) => {
   try {
     const rows = await Franchise.find({ isArchived: false }).sort({
@@ -104,6 +146,7 @@ const addNewFranchise = async (req, res) => {
       return res.status(400).json({ message: "MTOP already exists" });
     }
     const dateRenewal = new Date(franchiseDetails.date);
+    const datenow = new Date();
     let expireDate = new Date(franchiseDetails.date);
     expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
     // Create a new franchise document and save it to the database
@@ -140,6 +183,7 @@ const addNewFranchise = async (req, res) => {
       REMARKS: franchiseDetails.remarks,
       isArchived: false,
       DATE_EXPIRED: expireDate,
+      createdAt: datenow,
     });
 
     res.status(201).json(newFranchise);
@@ -228,6 +272,23 @@ const handleFranchiseTransfer = async (req, res) => {
   }
 };
 
+function isSameDay(date1, date2) {
+  // Parse strings to Date objects if inputs are strings
+  if (typeof date1 === "string") {
+    date1 = new Date(date1);
+  }
+  if (typeof date2 === "string") {
+    date2 = new Date(date2);
+  }
+
+  // Check if the dates are on the same day
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
 const handleFranchiseUpdate = async (req, res) => {
   try {
     const franchiseDetails = req.body;
@@ -252,50 +313,165 @@ const handleFranchiseUpdate = async (req, res) => {
     }
 
     const dateRenewal = new Date(franchiseDetails.date);
+    let renewdate = new Date();
     let expireDate = new Date(franchiseDetails.date);
     expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
 
-    const updatedFranchise = await Franchise.findByIdAndUpdate(
-      franchiseDetails.id,
-      {
-        DATE_RENEWAL: dateRenewal,
-        FIRSTNAME: franchiseDetails.fname,
-        LASTNAME: franchiseDetails.lname,
-        MI: franchiseDetails.mi,
-        ADDRESS: franchiseDetails.address,
-        OWNER_NO: franchiseDetails.contact,
-        OWNER_SEX: franchiseDetails.ownerSex,
-        DRIVERS_NAME: franchiseDetails.drivername,
-        DRIVERS_ADDRESS: franchiseDetails.driveraddress,
-        DRIVERS_NO: franchiseDetails.contact2,
-        DRIVERS_SEX: franchiseDetails.driverSex,
-        DRIVERS_LICENSE_NO: franchiseDetails.driverlicenseno,
-        MODEL: franchiseDetails.model,
-        PLATE_NO: franchiseDetails.plateno,
-        MOTOR_NO: franchiseDetails.motorno,
-        STROKE: franchiseDetails.stroke,
-        CHASSIS_NO: franchiseDetails.chassisno,
-        FUEL_DISP: franchiseDetails.fuelDisp,
-        OR: franchiseDetails.or,
-        CR: franchiseDetails.cr,
-        TPL_PROVIDER: franchiseDetails.tplProvider,
-        TPL_DATE_1: franchiseDetails.tplDate1,
-        TPL_DATE_2: franchiseDetails.tplDate2,
-        TYPE_OF_FRANCHISE: franchiseDetails.typeofFranchise,
-        KIND_OF_BUSINESS: franchiseDetails.kindofBusiness,
-        TODA: franchiseDetails.toda,
-        DATE_RELEASE_OF_ST_TP: franchiseDetails.daterelease,
-        ROUTE: franchiseDetails.route,
-        REMARKS: franchiseDetails.remarks,
-        isArchived: false,
-        DATE_EXPIRED: expireDate,
-      },
-      { new: true }
+    const foundFranchise = await Franchise.findOne({
+      _id: franchiseDetails.id,
+    });
+
+    const sameRenewalDate = isSameDay(
+      franchiseDetails.date,
+      foundFranchise.DATE_RENEWAL
     );
 
-    res.status(201).json(updatedFranchise);
+    console.log(sameRenewalDate);
+    if (!sameRenewalDate) {
+      foundFranchise.renewedAt = renewdate;
+    }
+
+    foundFranchise.DATE_RENEWAL = dateRenewal;
+    foundFranchise.FIRSTNAME = franchiseDetails.fname;
+    foundFranchise.LASTNAME = franchiseDetails.lname;
+    foundFranchise.MI = franchiseDetails.mi;
+    foundFranchise.ADDRESS = franchiseDetails.address;
+    foundFranchise.OWNER_NO = franchiseDetails.contact;
+    foundFranchise.OWNER_SEX = franchiseDetails.ownerSex;
+    foundFranchise.DRIVERS_NAME = franchiseDetails.drivername;
+    foundFranchise.DRIVERS_ADDRESS = franchiseDetails.driveraddress;
+    foundFranchise.DRIVERS_NO = franchiseDetails.contact2;
+    foundFranchise.DRIVERS_SEX = franchiseDetails.driverSex;
+    foundFranchise.DRIVERS_LICENSE_NO = franchiseDetails.driverlicenseno;
+    foundFranchise.MODEL = franchiseDetails.model;
+    foundFranchise.PLATE_NO = franchiseDetails.plateno;
+    foundFranchise.MOTOR_NO = franchiseDetails.motorno;
+    foundFranchise.STROKE = franchiseDetails.stroke;
+    foundFranchise.CHASSIS_NO = franchiseDetails.chassisno;
+    foundFranchise.FUEL_DISP = franchiseDetails.fuelDisp;
+    foundFranchise.OR = franchiseDetails.or;
+    foundFranchise.CR = franchiseDetails.cr;
+    foundFranchise.TPL_PROVIDER = franchiseDetails.tplProvider;
+    foundFranchise.TPL_DATE_1 = franchiseDetails.tplDate1;
+    foundFranchise.TPL_DATE_2 = franchiseDetails.tplDate2;
+    foundFranchise.TYPE_OF_FRANCHISE = franchiseDetails.typeofFranchise;
+    foundFranchise.KIND_OF_BUSINESS = franchiseDetails.kindofBusiness;
+    foundFranchise.TODA = franchiseDetails.toda;
+    foundFranchise.DATE_RELEASE_OF_ST_TP = franchiseDetails.daterelease;
+    foundFranchise.ROUTE = franchiseDetails.route;
+    foundFranchise.REMARKS = franchiseDetails.remarks;
+    foundFranchise.isArchived = false;
+    foundFranchise.DATE_EXPIRED = expireDate;
+
+    await foundFranchise.save();
+
+    res.status(201).json(foundFranchise);
   } catch (error) {
     console.error("Error updating franchise:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getAnalytics = async (req, res) => {
+  const currentDate = new Date();
+  const currentDay = currentDate.getDay();
+  const today = currentDate.setHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0 to get the start of the day
+  const startOfWeek = new Date(getStartOfCurrentWeek()); //6 days ago 00:00
+  const endOfWeek = new Date(getEndOfCurrentWeek()); // today 23:59
+
+  try {
+    // get recentlyAdded
+    const recentlyAdded = await Franchise.find({
+      isArchived: false,
+      createdAt: { $gte: today },
+    });
+    // get recentlyRevoked
+    const recentlyRevoked = await Franchise.find({
+      isArchived: true,
+      DATE_ARCHIVED: { $gte: today },
+    });
+    // get dailyAdded franchises
+    const dailyAdded = await Franchise.aggregate([
+      {
+        $match: {
+          isArchived: false,
+          createdAt: { $gte: startOfWeek, $lte: endOfWeek },
+        },
+      },
+      {
+        $group: {
+          _id: { $dayOfWeek: "$createdAt" },
+          added: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          _id: -1, // Sort _id in descending order
+        },
+      },
+    ]);
+    // get dailyRenewed franchises
+    const dailyRenewed = await Franchise.aggregate([
+      {
+        $match: {
+          isArchived: false,
+          renewedAt: { $gte: startOfWeek, $lte: endOfWeek },
+        },
+      },
+      {
+        $group: {
+          _id: { $dayOfWeek: "$renewedAt" },
+          renewed: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          _id: -1, // Sort _id in descending order
+        },
+      },
+    ]);
+
+    const dailyRevoked = await Franchise.aggregate([
+      {
+        $match: {
+          isArchived: true,
+          DATE_ARCHIVED: { $gte: startOfWeek, $lte: endOfWeek },
+        },
+      },
+      {
+        $group: {
+          _id: { $dayOfWeek: "$DATE_ARCHIVED" },
+          revoked: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          _id: -1, // Sort _id in descending order
+        },
+      },
+    ]);
+
+    const mergeArray = mergeArrays(dailyRevoked, dailyAdded, dailyRenewed);
+    const sortedResult = sortAndRotateArray(mergeArray, currentDay);
+    const franchiseAnalytics = [];
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    sortedResult.map((item) => {
+      // if (item._id != 1 && item._id != 7) {
+      franchiseAnalytics.push({
+        ...item,
+        key: item._id - 1 == currentDay ? "Today" : daysOfWeek[item._id - 1],
+      });
+      // }
+    });
+
+    res.json({
+      recentlyAdded: recentlyAdded.length,
+      recentlyRevoked: recentlyRevoked.length,
+      franchiseAnalytics: franchiseAnalytics,
+    });
+  } catch (err) {
+    console.error("Error fetching data:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -308,4 +484,5 @@ module.exports = {
   addNewFranchise,
   handleFranchiseTransfer,
   handleFranchiseUpdate,
+  getAnalytics,
 };

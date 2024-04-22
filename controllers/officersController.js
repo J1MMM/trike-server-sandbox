@@ -9,11 +9,29 @@ const nodeMailer = require("nodemailer");
 const ROLES_LIST = require("../config/roles_list");
 const Officer = require("../model/Officer");
 const ViolationList = require("../model/ViolationList");
+const cron = require("cron");
+
+const resetOfficerApprehension = async () => {
+  try {
+    await Officer.updateMany({}, { $set: { apprehended: 0 } });
+    console.log("apprehended reset");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const job = new cron.CronJob(
+  "0 0 0 * * 1", // cronTime
+  resetOfficerApprehension, // onTick
+  null, // onComplete
+  true, // start
+  "Asia/Manila" // timeZone
+);
 
 const getAllOfficer = async (req, res) => {
   try {
     const result = await Officer.find().sort({
-      callsign: "asc",
+      apprehended: "desc",
     });
     if (!result) return res.status(204).json({ message: "No Officers found" });
 

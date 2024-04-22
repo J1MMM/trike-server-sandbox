@@ -7,7 +7,7 @@ const violationSchema = new Schema({
     required: true,
   },
   dateApprehension: {
-    type: String,
+    type: "date",
     required: true,
   },
   confiscatedDL: {
@@ -60,7 +60,7 @@ const violationSchema = new Schema({
     required: false,
   },
   orDate: {
-    type: String,
+    type: "date",
     required: false,
   },
   timeViolation: {
@@ -84,7 +84,7 @@ const violationSchema = new Schema({
     required: false,
   },
   datePaid: {
-    type: String,
+    type: "date",
     required: false,
   },
 });
