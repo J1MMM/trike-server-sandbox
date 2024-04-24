@@ -45,3 +45,9 @@
 2024/04/22	15:37:46	c52cedd2-7681-49b8-9c63-644e9b694060	Error: Not allowed by CORS
 2024/04/22	15:37:46	f4ff7ef3-3077-4b97-9b55-f3d2d3c442d4	Error: Not allowed by CORS
 2024/04/22	15:37:51	d84a2f32-5c58-4cc1-8ff1-afd048b525be	Error: Not allowed by CORS
+2024/04/24	08:56:20	cd57194d-0173-4c2d-9448-1bd0ede1f09c	Error: Not allowed by CORS
+2024/04/24	08:56:20	11352503-8bf1-44ed-9fe4-2d6187fbfff5	Error: Not allowed by CORS
+2024/04/24	08:56:53	1be43f20-261e-4a93-bd3d-b8424cdec294	Error: Not allowed by CORS
+2024/04/24	08:56:53	9003bec0-a871-45f1-81bc-742885eceaa0	Error: Not allowed by CORS
+2024/04/24	08:57:02	aa7e9463-abbe-4a08-bf22-350f51f6040f	Error: Not allowed by CORS
+2024/04/24	08:57:11	bed65cbb-ca4e-43e3-819b-655327ff4319	Error: Not allowed by CORS

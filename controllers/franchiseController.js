@@ -1,17 +1,5 @@
 const Franchise = require("../model/Franchise");
 
-function getStartOfCurrentWeek() {
-  let currentDate = new Date();
-  let diff = currentDate.getDate() - 6; // Adjust 6 days ago
-  return new Date(currentDate.setDate(diff)).setHours(0, 0, 0, 0);
-}
-
-function getEndOfCurrentWeek() {
-  let currentDate = new Date();
-  currentDate.setHours(23, 59, 59, 999);
-  return currentDate;
-}
-
 function mergeArrays(arr1, arr2, arr3) {
   const arr7length = Array.from({ length: 7 }, () => null);
   const mergedArray = [];
@@ -259,6 +247,7 @@ const handleFranchiseTransfer = async (req, res) => {
       REMARKS: franchiseDetails.remarks,
       isArchived: false,
       DATE_EXPIRED: expireDate,
+      createdAt: datenow,
     });
 
     res.status(201).json({
@@ -373,102 +362,58 @@ const handleFranchiseUpdate = async (req, res) => {
 };
 
 const getAnalytics = async (req, res) => {
-  const currentDate = new Date();
-  const currentDay = currentDate.getDay();
-  const today = currentDate.setHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0 to get the start of the day
-  const startOfWeek = new Date(getStartOfCurrentWeek()); //6 days ago 00:00
-  const endOfWeek = new Date(getEndOfCurrentWeek()); // today 23:59
-
   try {
+    const dateNow = new Date();
+    const today = dateNow.setHours(0, 0, 0, 0);
+    const numDays = 6;
+    const dayNow = dateNow.getDay();
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const dailyFranchiseAnalytics = [];
+
+    for (let i = numDays; i >= 0; i--) {
+      const currentDate = new Date(dateNow);
+      const date = currentDate.getDate() - i;
+      const day = new Date(currentDate.setDate(date)).getDay();
+      const start = new Date(currentDate.setDate(date)).setHours(0, 0, 0, 0);
+      const end = new Date(currentDate.setDate(date)).setHours(23, 59, 59, 999);
+
+      const added = await Franchise.countDocuments({
+        isArchived: false,
+        createdAt: { $gte: start, $lte: end },
+      });
+
+      const revoked = await Franchise.countDocuments({
+        isArchived: true,
+        DATE_ARCHIVED: { $gte: start, $lte: end },
+      });
+
+      const renewed = await Franchise.countDocuments({
+        isArchived: false,
+        renewedAt: { $gte: start, $lte: end },
+      });
+
+      dailyFranchiseAnalytics.push({
+        key: day == dayNow ? "Today" : days[day],
+        added: added,
+        renewed: renewed,
+        revoked: revoked,
+      });
+    }
     // get recentlyAdded
-    const recentlyAdded = await Franchise.find({
+    const recentlyAdded = await Franchise.countDocuments({
       isArchived: false,
       createdAt: { $gte: today },
     });
     // get recentlyRevoked
-    const recentlyRevoked = await Franchise.find({
+    const recentlyRevoked = await Franchise.countDocuments({
       isArchived: true,
       DATE_ARCHIVED: { $gte: today },
     });
-    // get dailyAdded franchises
-    const dailyAdded = await Franchise.aggregate([
-      {
-        $match: {
-          isArchived: false,
-          createdAt: { $gte: startOfWeek, $lte: endOfWeek },
-        },
-      },
-      {
-        $group: {
-          _id: { $dayOfWeek: "$createdAt" },
-          added: { $sum: 1 },
-        },
-      },
-      {
-        $sort: {
-          _id: -1, // Sort _id in descending order
-        },
-      },
-    ]);
-    // get dailyRenewed franchises
-    const dailyRenewed = await Franchise.aggregate([
-      {
-        $match: {
-          isArchived: false,
-          renewedAt: { $gte: startOfWeek, $lte: endOfWeek },
-        },
-      },
-      {
-        $group: {
-          _id: { $dayOfWeek: "$renewedAt" },
-          renewed: { $sum: 1 },
-        },
-      },
-      {
-        $sort: {
-          _id: -1, // Sort _id in descending order
-        },
-      },
-    ]);
-
-    const dailyRevoked = await Franchise.aggregate([
-      {
-        $match: {
-          isArchived: true,
-          DATE_ARCHIVED: { $gte: startOfWeek, $lte: endOfWeek },
-        },
-      },
-      {
-        $group: {
-          _id: { $dayOfWeek: "$DATE_ARCHIVED" },
-          revoked: { $sum: 1 },
-        },
-      },
-      {
-        $sort: {
-          _id: -1, // Sort _id in descending order
-        },
-      },
-    ]);
-
-    const mergeArray = mergeArrays(dailyRevoked, dailyAdded, dailyRenewed);
-    const sortedResult = sortAndRotateArray(mergeArray, currentDay);
-    const franchiseAnalytics = [];
-    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-    sortedResult.map((item) => {
-      // if (item._id != 1 && item._id != 7) {
-      franchiseAnalytics.push({
-        ...item,
-        key: item._id - 1 == currentDay ? "Today" : daysOfWeek[item._id - 1],
-      });
-      // }
-    });
 
     res.json({
-      recentlyAdded: recentlyAdded.length,
-      recentlyRevoked: recentlyRevoked.length,
-      franchiseAnalytics: franchiseAnalytics,
+      recentlyAdded: recentlyAdded,
+      recentlyRevoked: recentlyRevoked,
+      franchiseAnalytics: dailyFranchiseAnalytics,
     });
   } catch (err) {
     console.error("Error fetching data:", err);
