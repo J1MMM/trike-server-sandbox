@@ -5,7 +5,6 @@ const Franchise = require("../model/Franchise");
 // Set the timezone to UTC
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault("Asia/Manila");
 
 const getAllFranchise = async (req, res) => {
   try {
@@ -35,7 +34,7 @@ const getAllArchived = async (req, res) => {
 
 const archiveFranchise = async (req, res) => {
   const { id } = req.body;
-  const datenow = new Date();
+  const datenow = dayjs().tz("Asia/Kuala_Lumpur");
   try {
     const updatedFranchise = await Franchise.findByIdAndUpdate(
       id,
@@ -110,10 +109,9 @@ const addNewFranchise = async (req, res) => {
     if (existingFranchise) {
       return res.status(400).json({ message: "MTOP already exists" });
     }
-    const dateRenewal = new Date(franchiseDetails.date);
-    const datenow = new Date();
-    let expireDate = new Date(franchiseDetails.date);
-    expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
+    const datenow = dayjs().tz("Asia/Kuala_Lumpur");
+    const dateRenewal = dayjs(franchiseDetails.date).tz("Asia/Kuala_Lumpur");
+    const expireDate = datenow.add(1, "year");
     // Create a new franchise document and save it to the database
     const newFranchise = await Franchise.create({
       MTOP: franchiseDetails.mtop,
@@ -180,10 +178,9 @@ const handleFranchiseTransfer = async (req, res) => {
         .status(400)
         .json({ message: "Important franchise details are required." });
     }
-    const datenow = new Date();
-    const dateRenewal = new Date(franchiseDetails.date);
-    let expireDate = new Date(franchiseDetails.date);
-    expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
+    const datenow = dayjs().tz("Asia/Kuala_Lumpur");
+    const dateRenewal = dayjs(franchiseDetails.date).tz("Asia/Kuala_Lumpur");
+    const expireDate = datenow.add(1, "year");
 
     const updatedOldFranchise = await Franchise.findByIdAndUpdate(
       franchiseDetails.id,
@@ -278,10 +275,9 @@ const handleFranchiseUpdate = async (req, res) => {
         .json({ message: "Important franchise details are required." });
     }
 
-    const dateRenewal = new Date(franchiseDetails.date);
-    let renewdate = new Date();
-    let expireDate = new Date(franchiseDetails.date);
-    expireDate = expireDate.setFullYear(expireDate.getFullYear() + 1);
+    const dateRenewal = dayjs(franchiseDetails.date).tz("Asia/Kuala_Lumpur");
+    let renewdate = dayjs().tz("Asia/Kuala_Lumpur");
+    let expireDate = dateRenewal.add(1, "year");
 
     const foundFranchise = await Franchise.findOne({
       _id: franchiseDetails.id,
@@ -340,18 +336,20 @@ const handleFranchiseUpdate = async (req, res) => {
 
 const getAnalytics = async (req, res) => {
   try {
-    const dateNow = dayjs();
-    const today = dateNow.startOf("day").subtract(8, "hours");
+    const dateNow = dayjs().tz("Asia/Kuala_Lumpur");
+    const today = dateNow.startOf("day");
     const numDays = 6;
     const dayNow = dateNow.day();
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const dailyFranchiseAnalytics = [];
 
     for (let i = numDays; i >= 0; i--) {
-      const currentDate = dayjs(dateNow).subtract(i, "day").startOf("day");
+      const currentDate = dayjs(dateNow)
+        .subtract(i, "day")
+        .tz("Asia/Kuala_Lumpur");
       const dayofWeek = currentDate.day();
-      const start = currentDate.startOf("day").subtract(8, "hours");
-      const end = currentDate.endOf("day").subtract(8, "hours");
+      const start = currentDate.startOf("day").toISOString();
+      const end = currentDate.endOf("day").toISOString();
 
       const added = await Franchise.countDocuments({
         isArchived: false,

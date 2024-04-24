@@ -11,6 +11,12 @@ const Officer = require("../model/Officer");
 const ViolationList = require("../model/ViolationList");
 const Violation = require("../model/Violation");
 const Franchise = require("../model/Franchise");
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const computeTotalPrice = (array) => {
   return array.reduce((total, obj) => total + obj?.price, 0);
@@ -270,7 +276,7 @@ const updateViolationPaidStatus = async (req, res) => {
       }
     }
 
-    const datenow = new Date();
+    const datenow = dayjs().tz("Asia/Kuala_Lumpur");
 
     if (violationDetails.franchiseNo) {
       let violations = violationDetails.violation?.map((obj) => obj.violation);
@@ -333,8 +339,8 @@ function removeDuplicates(array) {
 }
 
 const violationsAnalytics = async (req, res) => {
-  const dateNow = new Date();
-  const today = dateNow.setHours(0, 0, 0, 0);
+  const dateNow = dayjs().tz("Asia/Kuala_Lumpur");
+  const today = dateNow.startOf("day");
 
   try {
     const totalUnpaid = await Violation.countDocuments({ paid: false });
