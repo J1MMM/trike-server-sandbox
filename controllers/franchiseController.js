@@ -376,12 +376,12 @@ const getAnalytics = async (req, res) => {
         revoked: revoked,
       });
     }
+    console.log(today.toISOString());
     // get recentlyAdded
     const recentlyAdded = await Franchise.countDocuments({
       isArchived: false,
       createdAt: { $gte: today.toISOString() },
     });
-
     // get recentlyRevoked
     const recentlyRevoked = await Franchise.countDocuments({
       isArchived: true,
