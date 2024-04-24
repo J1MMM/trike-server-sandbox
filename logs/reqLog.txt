@@ -7102,3 +7102,5 @@
 2024/04/24	21:50:06	b044158d-aac1-4862-8667-cd89a1151087	GET	undefined	/franchise/analytics
 2024/04/24	21:50:53	807c9e14-4975-4f78-8f65-849380dacf22	GET	undefined	/franchise/analytics
 2024/04/24	21:51:24	fce1b87d-5479-463a-891d-9937b17c7ea0	GET	undefined	/franchise/analytics
+2024/04/24	21:56:30	49f2732e-f900-4f3e-9106-2486344b979c	GET	undefined	/franchise/analytics
+2024/04/24	22:05:16	e462ce0f-2ebe-487d-a84e-2ac38b51ac52	GET	undefined	/franchise/analytics
