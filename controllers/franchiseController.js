@@ -339,7 +339,7 @@ const getAnalytics = async (req, res) => {
     // Set the timezone to UTC
     dayjs.extend(utc);
     dayjs.extend(timezone);
-    dayjs.tz.setDefault("UTC");
+    dayjs.tz.setDefault("Asia/Manila");
 
     const dateNow = dayjs();
     const today = dateNow.startOf("day");
