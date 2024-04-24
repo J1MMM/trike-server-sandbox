@@ -310,13 +310,40 @@ const updateViolationPaidStatus = async (req, res) => {
         orDate: violationDetails.orDate,
         receiptNo: latestReceiptNo,
         datePaid: datenow,
-        payor: violationDetails.payor,
+        payor: violationDetails.name,
         remarks: violationDetails.remarks,
       },
       { new: true }
     );
     if (!updatedViolation) return res.sendStatus(400);
     res.json(latestReceiptNo);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const violationsAnalytics = async (req, res) => {
+  const dateNow = new Date();
+  const today = dateNow.setHours(0, 0, 0, 0);
+  try {
+    const registered = await Violation.aggregate([
+      {
+        $lookup: {
+          from: "Franchise",
+          localField: "franchiseNo",
+          foreignField: "MTOP",
+          as: "franchise",
+        },
+      },
+    ]);
+
+    const a = registered.filter((v) => v.paid == false);
+    console.log(a.length);
+    const recentlyPaid = await Violation.countDocuments({
+      datePaid: { $gte: today },
+    });
+    console.log(recentlyPaid);
+    res.json({ recentlyPaid });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -329,4 +356,5 @@ module.exports = {
   updateViolation,
   getViolationsPaid,
   updateViolationPaidStatus,
+  violationsAnalytics,
 };

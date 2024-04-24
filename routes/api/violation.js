@@ -8,6 +8,7 @@ const {
   updateViolation,
   getViolationsPaid,
   updateViolationPaidStatus,
+  violationsAnalytics,
 } = require("../../controllers/violationController");
 const router = express.Router();
 
@@ -21,5 +22,6 @@ router
 router.route("/list").get(getViolationList);
 
 router.route("/paid").get(getViolationsPaid);
+router.route("/analytics").get(violationsAnalytics);
 
 module.exports = router;
