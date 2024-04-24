@@ -322,29 +322,79 @@ const updateViolationPaidStatus = async (req, res) => {
   }
 };
 
+function removeDuplicates(array) {
+  // Use Set to store unique elements
+  const uniqueSet = new Set(array);
+
+  // Convert Set back to array
+  const uniqueArray = Array.from(uniqueSet);
+
+  return uniqueArray;
+}
+
 const violationsAnalytics = async (req, res) => {
   const dateNow = new Date();
   const today = dateNow.setHours(0, 0, 0, 0);
+
   try {
-    const registered = await Violation.aggregate([
+    const totalUnpaid = await Violation.countDocuments({ paid: false });
+    const recentlyPaid = await Violation.countDocuments({
+      datePaid: { $gte: today },
+    });
+
+    const registeredMTOPs = await Violation.aggregate([
+      {
+        $match: {
+          franchiseNo: { $exists: true, $ne: null, $ne: "" }, // Filter out documents where franchiseNo is empty or missing
+          paid: false,
+        },
+      },
       {
         $lookup: {
-          from: "Franchise",
+          from: "franchises",
           localField: "franchiseNo",
           foreignField: "MTOP",
           as: "franchise",
         },
       },
+      {
+        $match: {
+          "franchise.isArchived": false,
+          $expr: {
+            $in: ["$franchiseNo", "$franchise.MTOP"], // Filter to include only documents where Violation.franchiseNo exists in Franchise.MTOP
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          franchiseNo: 1, // Include only the Violation.franchiseNo field
+        },
+      },
     ]);
 
-    const a = registered.filter((v) => v.paid == false);
-    console.log(a.length);
-    const recentlyPaid = await Violation.countDocuments({
-      datePaid: { $gte: today },
+    const registered = registeredMTOPs.map((v) => v.franchiseNo).length;
+    const unregistered = totalUnpaid - registered;
+
+    const registeredPercentage = ((registered / totalUnpaid) * 100).toFixed();
+    const unregisteredPercentage = (
+      (unregistered / totalUnpaid) *
+      100
+    ).toFixed();
+
+    res.json({
+      registered,
+      unregistered,
+      registeredPercentage,
+      unregisteredPercentage,
+      recentlyPaid,
+      pieData: [
+        { id: 0, value: registered, label: "Registered", color: "#1A237E" },
+        { id: 1, value: unregistered, label: "Unregistered", color: "#ECEDFC" },
+      ],
     });
-    console.log(recentlyPaid);
-    res.json({ recentlyPaid });
   } catch (error) {
+    console.log(error.message);
     res.status(400).json({ message: error.message });
   }
 };

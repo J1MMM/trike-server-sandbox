@@ -1,3 +1,4 @@
+const dayjs = require("dayjs");
 const Franchise = require("../model/Franchise");
 
 function mergeArrays(arr1, arr2, arr3) {
@@ -363,19 +364,18 @@ const handleFranchiseUpdate = async (req, res) => {
 
 const getAnalytics = async (req, res) => {
   try {
-    const dateNow = new Date();
-    const today = dateNow.setHours(0, 0, 0, 0);
+    const dateNow = dayjs();
+    const today = dateNow.startOf("day");
     const numDays = 6;
-    const dayNow = dateNow.getDay();
+    const dayNow = dateNow.day();
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const dailyFranchiseAnalytics = [];
 
     for (let i = numDays; i >= 0; i--) {
-      const currentDate = new Date(dateNow);
-      const date = currentDate.getDate() - i;
-      const day = new Date(currentDate.setDate(date)).getDay();
-      const start = new Date(currentDate.setDate(date)).setHours(0, 0, 0, 0);
-      const end = new Date(currentDate.setDate(date)).setHours(23, 59, 59, 999);
+      const currentDate = dayjs(dateNow).subtract(i, "day");
+      const dayofWeek = currentDate.day();
+      const start = currentDate.startOf("day");
+      const end = currentDate.endOf("day");
 
       const added = await Franchise.countDocuments({
         isArchived: false,
@@ -393,7 +393,7 @@ const getAnalytics = async (req, res) => {
       });
 
       dailyFranchiseAnalytics.push({
-        key: day == dayNow ? "Today" : days[day],
+        key: dayofWeek == dayNow ? "Today" : days[dayofWeek],
         added: added,
         renewed: renewed,
         revoked: revoked,
@@ -404,6 +404,7 @@ const getAnalytics = async (req, res) => {
       isArchived: false,
       createdAt: { $gte: today },
     });
+
     // get recentlyRevoked
     const recentlyRevoked = await Franchise.countDocuments({
       isArchived: true,
