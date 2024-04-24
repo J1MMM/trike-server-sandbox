@@ -7104,3 +7104,15 @@
 2024/04/24	21:51:24	fce1b87d-5479-463a-891d-9937b17c7ea0	GET	undefined	/franchise/analytics
 2024/04/24	21:56:30	49f2732e-f900-4f3e-9106-2486344b979c	GET	undefined	/franchise/analytics
 2024/04/24	22:05:16	e462ce0f-2ebe-487d-a84e-2ac38b51ac52	GET	undefined	/franchise/analytics
+2024/04/24	22:08:03	6a75f4e2-667c-4f97-a6ec-6d71fbbd397a	GET	undefined	/franchise/analytics
+2024/04/24	22:10:45	afac63ba-0dde-48a3-9c34-30005ab060aa	GET	undefined	/franchise/analytics
+2024/04/24	22:12:02	d2cd1da3-311b-4252-99a7-2b4e11040d52	GET	undefined	/franchise/analytics
+2024/04/24	22:12:15	43cf005d-e764-4ff9-bb0b-7f07bf8ccedf	GET	undefined	/franchise/analytics
+2024/04/24	22:12:42	c126e7fa-f3a1-41b8-982d-ddf6358463a3	GET	undefined	/franchise/analytics
+2024/04/24	22:14:01	609335aa-954f-4199-a221-2d7fcc65bfb7	GET	undefined	/franchise/analytics
+2024/04/24	22:14:22	3f590e9f-7c88-4e43-b179-ff18bb62b514	GET	undefined	/franchise/analytics
+2024/04/24	22:14:48	69b83fa4-eab0-4249-9271-24a3107aa21c	GET	undefined	/franchise/analytics
+2024/04/24	22:15:40	6021aa87-46c5-46a0-85b3-bd10f7d97d09	GET	undefined	/franchise/analytics
+2024/04/24	22:16:28	a89e758f-c634-4272-9e34-5ee6ddc37e9a	GET	undefined	/franchise/analytics
+2024/04/24	22:16:51	8462f5cf-45d3-4594-8276-f531d39d7336	GET	undefined	/franchise/analytics
+2024/04/24	22:16:59	0d4ee716-2cd8-4f37-9e29-306ec45a748a	GET	undefined	/franchise/analytics

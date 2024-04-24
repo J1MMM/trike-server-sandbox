@@ -2,6 +2,10 @@ const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
 const Franchise = require("../model/Franchise");
+// Set the timezone to UTC
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Manila");
 
 const getAllFranchise = async (req, res) => {
   try {
@@ -336,13 +340,8 @@ const handleFranchiseUpdate = async (req, res) => {
 
 const getAnalytics = async (req, res) => {
   try {
-    // Set the timezone to UTC
-    dayjs.extend(utc);
-    dayjs.extend(timezone);
-    dayjs.tz.setDefault("Asia/Manila");
-
     const dateNow = dayjs();
-    const today = dateNow.startOf("day");
+    const today = dateNow.startOf("day").subtract(8, "hours");
     const numDays = 6;
     const dayNow = dateNow.day();
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -351,8 +350,8 @@ const getAnalytics = async (req, res) => {
     for (let i = numDays; i >= 0; i--) {
       const currentDate = dayjs(dateNow).subtract(i, "day").startOf("day");
       const dayofWeek = currentDate.day();
-      const start = currentDate.startOf("day").toISOString();
-      const end = currentDate.endOf("day").toISOString();
+      const start = currentDate.startOf("day").subtract(8, "hours");
+      const end = currentDate.endOf("day").subtract(8, "hours");
 
       const added = await Franchise.countDocuments({
         isArchived: false,
