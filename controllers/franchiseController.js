@@ -1,35 +1,7 @@
 const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
 const Franchise = require("../model/Franchise");
-
-function mergeArrays(arr1, arr2, arr3) {
-  const arr7length = Array.from({ length: 7 }, () => null);
-  const mergedArray = [];
-
-  arr7length.map((v, index) => {
-    const revokedObj = arr1.find((v) => v._id == index + 1);
-    const addedObj = arr2.find((v) => v._id == index + 1);
-    const renewedObj = arr3.find((v) => v._id == index + 1);
-
-    mergedArray.push({
-      _id: index + 1,
-      added: addedObj?.added || 0,
-      renewed: renewedObj?.renewed || 0,
-      revoked: revokedObj?.revoked || 0,
-    });
-  });
-
-  return mergedArray;
-}
-function sortAndRotateArray(array, currentDayOfWeek) {
-  // Sort the array based on the _id field (day of the week)
-  const sortedArray = array.sort((a, b) => a._id - b._id);
-  const rotateArray = (arr, rotations) => {
-    return [...arr.slice(rotations), ...arr.slice(0, rotations)];
-  };
-
-  const result = rotateArray(sortedArray, currentDayOfWeek + 1);
-  return result;
-}
 
 const getAllFranchise = async (req, res) => {
   try {
@@ -364,6 +336,11 @@ const handleFranchiseUpdate = async (req, res) => {
 
 const getAnalytics = async (req, res) => {
   try {
+    // Set the timezone to UTC
+    dayjs.extend(utc);
+    dayjs.extend(timezone);
+    dayjs.tz.setDefault("UTC");
+
     const dateNow = dayjs();
     const today = dateNow.startOf("day");
     const numDays = 6;
@@ -372,10 +349,10 @@ const getAnalytics = async (req, res) => {
     const dailyFranchiseAnalytics = [];
 
     for (let i = numDays; i >= 0; i--) {
-      const currentDate = dayjs(dateNow).subtract(i, "day");
+      const currentDate = dayjs(dateNow).subtract(i, "day").startOf("day");
       const dayofWeek = currentDate.day();
-      const start = currentDate.startOf("day");
-      const end = currentDate.endOf("day");
+      const start = currentDate.startOf("day").toISOString();
+      const end = currentDate.endOf("day").toISOString();
 
       const added = await Franchise.countDocuments({
         isArchived: false,
@@ -402,13 +379,13 @@ const getAnalytics = async (req, res) => {
     // get recentlyAdded
     const recentlyAdded = await Franchise.countDocuments({
       isArchived: false,
-      createdAt: { $gte: today },
+      createdAt: { $gte: today.toISOString() },
     });
 
     // get recentlyRevoked
     const recentlyRevoked = await Franchise.countDocuments({
       isArchived: true,
-      DATE_ARCHIVED: { $gte: today },
+      DATE_ARCHIVED: { $gte: today.toISOString() },
     });
 
     res.json({
