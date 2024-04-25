@@ -388,11 +388,18 @@ const violationsAnalytics = async (req, res) => {
       100
     ).toFixed();
 
+    // Check if the result is NaN, if so, set it to 0
+    const registeredPercentageResult = isNaN(registeredPercentage)
+      ? 0
+      : registeredPercentage;
+    const unregisteredPercentageResult = isNaN(unregisteredPercentage)
+      ? 0
+      : unregisteredPercentage;
     res.json({
       registered,
       unregistered,
-      registeredPercentage,
-      unregisteredPercentage,
+      registeredPercentage: registeredPercentageResult,
+      unregisteredPercentage: unregisteredPercentageResult,
       recentlyPaid,
       pieData: [
         { id: 0, value: registered, label: "Registered", color: "#1A237E" },

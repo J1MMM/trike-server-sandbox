@@ -33,15 +33,15 @@ const handleLogin = async (req, res) => {
 
     // if user allreafy login
     const rToken = foundUser.refreshToken;
-    if (rToken != "") {
-      res.cookie("jwt", rToken, {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: "None",
-        secure: true,
-      }); //secure: true
-      return res.json({ roles, accessToken, fullname });
-    }
+    // if (rToken != "") {
+    //   res.cookie("jwt", rToken, {
+    //     httpOnly: true,
+    //     maxAge: 24 * 60 * 60 * 1000,
+    //     sameSite: "None",
+    //     secure: true,
+    //   }); //secure: true
+    //   return res.json({ roles, accessToken, fullname });
+    // }
 
     const refreshToken = jwt.sign(
       { email: foundUser.email },
