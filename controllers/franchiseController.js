@@ -384,8 +384,13 @@ const getAnalytics = async (req, res) => {
       isArchived: true,
       DATE_ARCHIVED: { $gte: today.toISOString() },
     });
+    // get franchises
+    const franchises = await Franchise.countDocuments({
+      isArchived: false,
+    });
 
     res.json({
+      franchises: franchises,
       recentlyAdded: recentlyAdded,
       recentlyRevoked: recentlyRevoked,
       franchiseAnalytics: dailyFranchiseAnalytics,
