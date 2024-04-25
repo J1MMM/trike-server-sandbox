@@ -6,12 +6,34 @@ const Franchise = require("../model/Franchise");
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+function findDuplicateMTOP(arrayOfObjects) {
+  const mtopCounts = {}; // Object to store counts of each MTOP
+
+  // Iterate through the array of objects
+  arrayOfObjects.forEach((obj) => {
+    const mtop = obj.MTOP; // Assuming MTOP property name is 'MTOP'
+
+    // Increment count for the current MTOP
+    mtopCounts[mtop] = (mtopCounts[mtop] || 0) + 1;
+  });
+
+  // Find MTOPs with counts greater than 1 (indicating duplicates)
+  const duplicates = Object.keys(mtopCounts).filter(
+    (mtop) => mtopCounts[mtop] > 1
+  );
+
+  return duplicates;
+}
+
 const getAllFranchise = async (req, res) => {
   try {
     const rows = await Franchise.find({ isArchived: false }).sort({
       MTOP: "asc",
     });
     const totalRows = await Franchise.countDocuments({ isArchived: false });
+
+    // console.log(findDuplicateMTOP(rows));
+
     res.json({ rows, totalRows });
   } catch (err) {
     console.error("Error fetching data:", err);
