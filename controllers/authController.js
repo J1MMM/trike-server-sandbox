@@ -28,7 +28,7 @@ const handleLogin = async (req, res) => {
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "7d" }
     );
 
     // if user allreafy login
@@ -46,7 +46,7 @@ const handleLogin = async (req, res) => {
     const refreshToken = jwt.sign(
       { email: foundUser.email },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "7d" }
     );
 
     foundUser.refreshToken = refreshToken;

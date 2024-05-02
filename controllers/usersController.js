@@ -17,6 +17,15 @@ const getAllUsers = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+const checkEmailDuplication = async (req, res) => {
+  try {
+    const result = await User.find({ email: req.body.email });
+    res.json(result);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json({ message: error.message });
+  }
+};
 
 const createUser = async (req, res) => {
   const accountDetails = req.body;
@@ -44,18 +53,17 @@ const createUser = async (req, res) => {
       roles: { [accountDetails.role]: ROLES_LIST[accountDetails.role] },
     });
 
-    res
-      .status(201)
-      .json({
-        success: `New user ${accountDetails.fname} has been created successfully!`,
-        result,
-      });
+    res.status(201).json({
+      success: `New user ${accountDetails.fname} has been created successfully!`,
+      result,
+    });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
 const updateUser = async (req, res) => {
+  console.log(req.body);
   if (!req.body?.id)
     return res.status(400).json({ message: "ID are required" });
 
@@ -68,20 +76,6 @@ const updateUser = async (req, res) => {
     } else {
       pwdMatch = true;
     }
-
-    if (
-      user.firstname == req?.body?.firstname &&
-      user.lastname == req?.body?.lastname &&
-      user.middlename == req?.body?.middlename &&
-      user.email == req?.body?.email &&
-      pwdMatch &&
-      req?.body?.gender == user.gender &&
-      user.address == req?.body?.address &&
-      user.contactNo == req?.body?.contactNo
-    )
-      return res
-        .status(304)
-        .json({ message: `No changes for user with email: ${user.email}` });
 
     const duplicate = await User.findOne({ email: req.body.email }).exec();
     if (duplicate && duplicate._id != req.body.id)
@@ -99,21 +93,8 @@ const updateUser = async (req, res) => {
     if (req?.body?.email) user.email = req.body.email;
     if (req?.body?.password)
       user.password = await bcrypt.hash(req.body.password, 10);
-
-    const updateOperation = {
-      $set: {
-        instructor: `${user.firstname} ${user.lastname}`,
-      },
-    };
-
-    const updateLessonIns = {
-      $set: {
-        instructor: `${user.firstname} ${user.lastname}`,
-      },
-    };
-
-    await Student.updateMany({ teacherID: req.body.id }, updateOperation);
-    await Lesson.updateMany({ teacherID: req.body.id }, updateLessonIns);
+    if (req?.body?.role)
+      user.roles = { [req.body.role]: ROLES_LIST[req.body.role] };
 
     const result = await user.save();
     res.json({ success: "User updated successfully!", result });
@@ -194,4 +175,5 @@ module.exports = {
   deleteUser,
   getUser,
   archiveUser,
+  checkEmailDuplication,
 };

@@ -51,3 +51,7 @@
 2024/04/24	08:56:53	9003bec0-a871-45f1-81bc-742885eceaa0	Error: Not allowed by CORS
 2024/04/24	08:57:02	aa7e9463-abbe-4a08-bf22-350f51f6040f	Error: Not allowed by CORS
 2024/04/24	08:57:11	bed65cbb-ca4e-43e3-819b-655327ff4319	Error: Not allowed by CORS
+2024/04/27	09:54:39	a186b97a-338f-430d-a256-c22015123f02	SyntaxError: Unexpected token '"', "#" is not valid JSON
+2024/04/27	09:55:44	8959601f-8ef2-427e-a1bd-f37e10786311	SyntaxError: Unexpected token '"', "#" is not valid JSON
+2024/04/27	09:55:52	d9cdc63a-a60d-41b0-b243-5089c6b084d7	SyntaxError: Unexpected token '"', "#" is not valid JSON
+2024/04/27	09:56:53	58fa3e1d-43fe-456e-a6c3-24fe7bc32d28	SyntaxError: Unexpected token '"', "#" is not valid JSON

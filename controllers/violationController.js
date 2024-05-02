@@ -229,6 +229,9 @@ const updateViolation = async (req, res) => {
       }
     }
 
+    const totalPrice = computeTotalPrice(violationDetails?.violation);
+    violationDetails.amount = parseInt(totalPrice);
+
     if (newFranchise) await newFranchise.save();
     if (prevFranchise) await prevFranchise.save();
     console.log("====================================================");
@@ -258,24 +261,6 @@ const updateViolationPaidStatus = async (req, res) => {
   try {
     const violationDetails = req.body;
     if (!violationDetails) return res.sendStatus(400);
-
-    let latestReceiptNo = await Violation.find()
-      .sort({ receiptNo: -1 })
-      .limit(1)
-      .select("receiptNo");
-
-    console.log(latestReceiptNo);
-    if (latestReceiptNo.length > 0) {
-      latestReceiptNo = latestReceiptNo[0].receiptNo;
-
-      if (latestReceiptNo == "") {
-        latestReceiptNo = "0000001";
-      } else {
-        const receiptNumber = parseInt(latestReceiptNo, 10);
-        latestReceiptNo = (receiptNumber + 1).toString().padStart(7, "0");
-      }
-    }
-
     const datenow = dayjs().tz("Asia/Kuala_Lumpur");
 
     if (violationDetails.franchiseNo) {
@@ -314,7 +299,7 @@ const updateViolationPaidStatus = async (req, res) => {
         paid: true,
         or: violationDetails.or,
         orDate: violationDetails.orDate,
-        receiptNo: latestReceiptNo,
+        receiptNo: violationDetails.or,
         datePaid: datenow,
         payor: violationDetails.name,
         remarks: violationDetails.remarks,
@@ -322,7 +307,7 @@ const updateViolationPaidStatus = async (req, res) => {
       { new: true }
     );
     if (!updatedViolation) return res.sendStatus(400);
-    res.json(latestReceiptNo);
+    res.sendStatus(201);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
