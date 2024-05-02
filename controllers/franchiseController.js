@@ -2,6 +2,7 @@ const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
 const Franchise = require("../model/Franchise");
+const PendingFranchise = require("../model/PendingFranchise");
 // Set the timezone to UTC
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -82,15 +83,20 @@ const getAllAvailableMTOPs = async (req, res) => {
       MTOP: { $gte: 0, $lte: 7500 },
     }).distinct("MTOP");
 
+    const mtopInPending = await PendingFranchise.find({
+      isArchived: false,
+      MTOP: { $gte: 0, $lte: 7500 },
+    }).distinct("MTOP");
+
+    const allUsedMtop = [...mtopInPending, ...usedFranchises];
+
     // Generate an array containing all MTOP numbers from 0001 to 7500
     const allMTOPs = Array.from({ length: 7500 }, (_, index) =>
       String(index + 1).padStart(4, "0")
     );
 
     // Find the missing MTOP numbers by filtering out the used MTOP numbers
-    const missingMTOPs = allMTOPs.filter(
-      (MTOP) => !usedFranchises.includes(MTOP)
-    );
+    const missingMTOPs = allMTOPs.filter((MTOP) => !allUsedMtop.includes(MTOP));
 
     // Return the array of missing MTOP numbers as JSON response
     return res.json(missingMTOPs);
@@ -134,8 +140,24 @@ const addNewFranchise = async (req, res) => {
     const datenow = dayjs().tz("Asia/Kuala_Lumpur");
     const dateRenewal = dayjs(franchiseDetails.date).tz("Asia/Kuala_Lumpur");
     const expireDate = datenow.add(1, "year");
+
+    const latestPendingFranchise = await PendingFranchise.find()
+      .sort({ refNo: -1 }) // Sort in descending order
+      .limit(1);
+
+    let latestRefNo;
+
+    console.log(latestPendingFranchise);
+    if (latestPendingFranchise.length > 0) {
+      // Convert refNo to a number
+      latestRefNo = parseInt(latestPendingFranchise[0].refNo) + 1;
+    } else {
+      latestRefNo = 154687;
+    }
+    console.log(latestRefNo);
+
     // Create a new franchise document and save it to the database
-    const newFranchise = await Franchise.create({
+    const newFranchise = await PendingFranchise.create({
       MTOP: franchiseDetails.mtop,
       DATE_RENEWAL: dateRenewal,
       FIRSTNAME: franchiseDetails.fname,
@@ -169,9 +191,10 @@ const addNewFranchise = async (req, res) => {
       isArchived: false,
       DATE_EXPIRED: expireDate,
       createdAt: datenow,
+      refNo: latestRefNo,
     });
 
-    res.status(201).json(newFranchise);
+    res.status(201).json(latestRefNo);
   } catch (error) {
     console.error("Error adding new franchise:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -277,21 +300,7 @@ function isSameDay(date1, date2) {
 const handleFranchiseUpdate = async (req, res) => {
   try {
     const franchiseDetails = req.body;
-    if (
-      !franchiseDetails.mtop ||
-      !franchiseDetails.date ||
-      !franchiseDetails.fname ||
-      !franchiseDetails.lname ||
-      !franchiseDetails.address ||
-      !franchiseDetails.contact ||
-      !franchiseDetails.drivername ||
-      !franchiseDetails.driveraddress ||
-      !franchiseDetails.model ||
-      !franchiseDetails.plateno ||
-      !franchiseDetails.motorno ||
-      !franchiseDetails.or ||
-      !franchiseDetails.cr
-    ) {
+    if (!franchiseDetails) {
       return res
         .status(400)
         .json({ message: "Important franchise details are required." });
@@ -310,46 +319,120 @@ const handleFranchiseUpdate = async (req, res) => {
       foundFranchise.DATE_RENEWAL
     );
 
-    console.log(sameRenewalDate);
     if (!sameRenewalDate) {
       foundFranchise.renewedAt = renewdate;
     }
 
-    foundFranchise.DATE_RENEWAL = dateRenewal;
-    foundFranchise.FIRSTNAME = franchiseDetails.fname;
-    foundFranchise.LASTNAME = franchiseDetails.lname;
-    foundFranchise.MI = franchiseDetails.mi;
-    foundFranchise.ADDRESS = franchiseDetails.address;
-    foundFranchise.OWNER_NO = franchiseDetails.contact;
-    foundFranchise.OWNER_SEX = franchiseDetails.ownerSex;
-    foundFranchise.DRIVERS_NAME = franchiseDetails.drivername;
-    foundFranchise.DRIVERS_ADDRESS = franchiseDetails.driveraddress;
-    foundFranchise.DRIVERS_NO = franchiseDetails.contact2;
-    foundFranchise.DRIVERS_SEX = franchiseDetails.driverSex;
-    foundFranchise.DRIVERS_LICENSE_NO = franchiseDetails.driverlicenseno;
-    foundFranchise.MODEL = franchiseDetails.model;
-    foundFranchise.PLATE_NO = franchiseDetails.plateno;
-    foundFranchise.MOTOR_NO = franchiseDetails.motorno;
-    foundFranchise.STROKE = franchiseDetails.stroke;
-    foundFranchise.CHASSIS_NO = franchiseDetails.chassisno;
-    foundFranchise.FUEL_DISP = franchiseDetails.fuelDisp;
-    foundFranchise.OR = franchiseDetails.or;
-    foundFranchise.CR = franchiseDetails.cr;
-    foundFranchise.TPL_PROVIDER = franchiseDetails.tplProvider;
-    foundFranchise.TPL_DATE_1 = franchiseDetails.tplDate1;
-    foundFranchise.TPL_DATE_2 = franchiseDetails.tplDate2;
-    foundFranchise.TYPE_OF_FRANCHISE = franchiseDetails.typeofFranchise;
-    foundFranchise.KIND_OF_BUSINESS = franchiseDetails.kindofBusiness;
-    foundFranchise.TODA = franchiseDetails.toda;
-    foundFranchise.DATE_RELEASE_OF_ST_TP = franchiseDetails.daterelease;
-    foundFranchise.ROUTE = franchiseDetails.route;
-    foundFranchise.REMARKS = franchiseDetails.remarks;
-    foundFranchise.isArchived = false;
-    foundFranchise.DATE_EXPIRED = expireDate;
-
+    foundFranchise.pending = true;
     await foundFranchise.save();
+    // get ref number
+    const latestPendingFranchise = await PendingFranchise.find()
+      .sort({ refNo: -1 }) // Sort in descending order
+      .limit(1);
 
-    res.status(201).json(foundFranchise);
+    let refNo;
+
+    if (latestPendingFranchise.length > 0) {
+      // Convert refNo to a number
+      refNo = parseInt(latestPendingFranchise[0].refNo) + 1;
+    } else {
+      refNo = 154687;
+    }
+
+    //generate receipt data
+    const initialreceiptData = [
+      { key: "1", label: "Mayor's Permit", price: 385.0 },
+      { key: "2", label: "Surcharge", price: 192.0 },
+      { key: "3", label: "Franchise Tax", price: 110.0 },
+      { key: "4", label: "Surcharge", price: 27.5 },
+      { key: "5", label: "Interest", price: 0 },
+      { key: "6", label: "Health / S.S.F.", price: 63.8 },
+      { key: "7", label: "Sticker", price: 55.0 },
+      { key: "8", label: "Filing Fee", price: 110.0 },
+      { key: "9", label: "Docket Fee", price: 27.5 },
+      { key: "10", label: "Filing Fee", price: 110.5 },
+      { key: "11", label: "Garbage Fee", price: 50.0 },
+      { key: "12", label: "Notarial Fee", price: 100.0 },
+    ];
+    // Get the current date and time
+    const dateNow = dayjs().tz("Asia/Kuala_Lumpur");
+    let monthsPassed = 0;
+    const dateRenew = dayjs(foundFranchise?.DATE_RENEWAL).tz(
+      "Asia/Kuala_Lumpur"
+    );
+    // Get the expiration date from foundFranchise (assuming DATE_EXPIRED is the property)
+    const expirationDate = dateRenew.add(1, "year");
+
+    // Check if the expiration date is in the past
+    if (expirationDate.isBefore(dateNow)) {
+      // Calculate the number of months that have passed since the expiration date
+      monthsPassed = dateNow.diff(expirationDate, "month");
+
+      // console.log(`Months passed since expiration: ${monthsPassed}`);
+    }
+
+    const franchiseTax = 110.0;
+    const surcharge = franchiseTax * 0.25;
+    const interest = (franchiseTax + surcharge) * 0.02;
+    console.log(franchiseTax);
+    console.log(surcharge);
+    console.log(interest);
+    const receiptData = initialreceiptData.map((v) => {
+      if (v.label == "Interest") {
+        return {
+          ...v,
+          price: monthsPassed == 0 ? interest : interest * monthsPassed,
+        };
+      } else {
+        return v;
+      }
+    });
+    console.log(franchiseDetails);
+
+    const newPendingFranchise = await PendingFranchise.create({
+      DATE_RENEWAL: dateRenewal,
+      FIRSTNAME: franchiseDetails.fname,
+      LASTNAME: franchiseDetails.lname,
+      MI: franchiseDetails.mi,
+      ADDRESS: franchiseDetails.address,
+      OWNER_NO: franchiseDetails.contact,
+      OWNER_SEX: franchiseDetails.ownerSex,
+      DRIVERS_NAME: franchiseDetails.drivername,
+      DRIVERS_ADDRESS: franchiseDetails.driveraddress,
+      DRIVERS_NO: franchiseDetails.contact2,
+      DRIVERS_SEX: franchiseDetails.driverSex,
+      DRIVERS_LICENSE_NO: franchiseDetails.driverlicenseno,
+      MODEL: franchiseDetails.model,
+      PLATE_NO: franchiseDetails.plateno,
+      MOTOR_NO: franchiseDetails.motorno,
+      STROKE: franchiseDetails.stroke,
+      CHASSIS_NO: franchiseDetails.chassisno,
+      FUEL_DISP: franchiseDetails.fuelDisp,
+      OR: franchiseDetails.or,
+      CR: franchiseDetails.cr,
+      TPL_PROVIDER: franchiseDetails.tplProvider,
+      TPL_DATE_1: franchiseDetails.tplDate1,
+      TPL_DATE_2: franchiseDetails.tplDate2,
+      TYPE_OF_FRANCHISE: franchiseDetails.typeofFranchise,
+      KIND_OF_BUSINESS: franchiseDetails.kindofBusiness,
+      TODA: franchiseDetails.toda,
+      DATE_RELEASE_OF_ST_TP: franchiseDetails.daterelease,
+      ROUTE: franchiseDetails.route,
+      REMARKS: franchiseDetails.remarks,
+      isArchived: false,
+      DATE_EXPIRED: expireDate,
+      //old fields
+      COMPLAINT: foundFranchise.COMPLAINT,
+      createdAt: foundFranchise.createdAt,
+      MTOP: foundFranchise.MTOP,
+      PAID_VIOLATIONS: foundFranchise.PAID_VIOLATIONS,
+      previousVersion: foundFranchise._id,
+      renewedAt: foundFranchise.renewedAt,
+      refNo: refNo,
+      receiptData: receiptData,
+    });
+
+    res.json({ refNo, receiptData });
   } catch (error) {
     console.error("Error updating franchise:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -395,7 +478,7 @@ const getAnalytics = async (req, res) => {
         revoked: revoked,
       });
     }
-    console.log(today.toISOString());
+
     // get recentlyAdded
     const recentlyAdded = await Franchise.countDocuments({
       isArchived: false,
@@ -423,6 +506,101 @@ const getAnalytics = async (req, res) => {
   }
 };
 
+const getFranchisePending = async (req, res) => {
+  try {
+    const result = await PendingFranchise.find({ isArchived: false }).sort({
+      MTOP: "asc",
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error("Error fetching data:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const pendingFranchisePayment = async (req, res) => {
+  try {
+    const franchiseDetails = req.body;
+    if (!franchiseDetails)
+      return res
+        .status(400)
+        .json({ message: "Important franchise details are required." });
+
+    const foundPending = await PendingFranchise.findOne({
+      _id: franchiseDetails.id,
+    });
+
+    if (!foundPending) res.status(404).json({ message: "record not found" });
+
+    let newFranchiseData;
+
+    const franchiseObj = {
+      MTOP: foundPending?.MTOP,
+      LASTNAME: foundPending?.LASTNAME,
+      FIRSTNAME: foundPending?.FIRSTNAME,
+      MI: foundPending?.MI,
+      ADDRESS: foundPending?.ADDRESS,
+      DRIVERS_NO: foundPending?.DRIVERS_NO,
+      OWNER_NO: foundPending?.OWNER_NO,
+      OWNER_SEX: foundPending?.OWNER_SEX,
+      TODA: foundPending?.TODA,
+      DRIVERS_NAME: foundPending?.DRIVERS_NAME,
+      DRIVERS_ADDRESS: foundPending?.DRIVERS_ADDRESS,
+      DRIVERS_SEX: foundPending?.DRIVERS_SEX,
+      OR: foundPending?.OR,
+      CR: foundPending?.CR,
+      DRIVERS_LICENSE_NO: foundPending?.DRIVERS_LICENSE_NO,
+      MODEL: foundPending?.MODEL,
+      MOTOR_NO: foundPending?.MOTOR_NO,
+      CHASSIS_NO: foundPending?.CHASSIS_NO,
+      PLATE_NO: foundPending?.PLATE_NO,
+      STROKE: foundPending?.STROKE,
+      FUEL_DISP: foundPending?.FUEL_DISP,
+      TPL_PROVIDER: foundPending?.TPL_PROVIDER,
+      TPL_DATE_1: foundPending?.TPL_DATE_1,
+      TPL_DATE_2: foundPending?.TPL_DATE_2,
+      DATE_RELEASE_OF_ST_TP: foundPending?.DATE_RELEASE_OF_ST_TP,
+      TYPE_OF_FRANCHISE: foundPending?.TYPE_OF_FRANCHISE,
+      KIND_OF_BUSINESS: foundPending?.KIND_OF_BUSINESS,
+      ROUTE: foundPending?.ROUTE,
+      COMPLAINT: foundPending?.COMPLAINT,
+      isArchived: foundPending?.isArchived,
+      PAID_VIOLATIONS: foundPending?.PAID_VIOLATIONS,
+      DATE_RENEWAL: foundPending?.DATE_RENEWAL,
+      DATE_EXPIRED: foundPending?.DATE_EXPIRED,
+      createdAt: foundPending?.createdAt,
+      DATE_ARCHIVED: foundPending?.DATE_ARCHIVED,
+      REMARKS: foundPending?.REMARKS,
+      renewedAt: foundPending?.renewedAt,
+      paymentOr: foundPending?.paymentOr,
+      paymentOrDate: foundPending?.paymentOrDate,
+      pending: false,
+    };
+
+    if (!foundPending?.previousVersion) {
+      // if previousVersion is empty it means franchise doesnt exist
+      newFranchiseData = await Franchise.create(franchiseObj);
+    } else {
+      // if franchise record exist
+      const foundFranchise = await Franchise.findOne({
+        _id: foundPending?.previousVersion,
+        isArchived: false,
+      });
+
+      await foundFranchise.set(franchiseObj);
+      newFranchiseData = await foundFranchise.save();
+    }
+
+    foundPending.isArchived = true;
+    await foundPending.save();
+    res.json({ newFranchiseData, receiptData: foundPending?.receiptData });
+  } catch (err) {
+    console.error("Error fetching data:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getAllFranchise,
   getAllArchived,
@@ -432,4 +610,6 @@ module.exports = {
   handleFranchiseTransfer,
   handleFranchiseUpdate,
   getAnalytics,
+  getFranchisePending,
+  pendingFranchisePayment,
 };

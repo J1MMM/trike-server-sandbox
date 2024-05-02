@@ -9,6 +9,8 @@ const {
   handleFranchiseTransfer,
   handleFranchiseUpdate,
   getAnalytics,
+  getFranchisePending,
+  pendingFranchisePayment,
 } = require("../../controllers/franchiseController");
 
 router
@@ -21,5 +23,7 @@ router.route("/available").get(getAllAvailableMTOPs);
 router.route("/transfer").post(handleFranchiseTransfer);
 router.route("/update").post(handleFranchiseUpdate);
 router.route("/analytics").get(getAnalytics);
+
+router.route("/pending").get(getFranchisePending).post(pendingFranchisePayment);
 
 module.exports = router;

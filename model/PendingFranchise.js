@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const franchiseSchema = new Schema({
+const pendingFranchiseSchema = new Schema({
+  previousVersion: { type: String, required: false },
   MTOP: {
     type: String,
     required: true,
@@ -144,7 +145,7 @@ const franchiseSchema = new Schema({
   },
   createdAt: {
     type: "date",
-    require: true,
+    require: false,
   },
   renewedAt: {
     type: "date",
@@ -152,6 +153,10 @@ const franchiseSchema = new Schema({
   },
   DATE_ARCHIVED: {
     type: "date",
+    required: false,
+  },
+  refNo: {
+    type: String,
     required: false,
   },
   paymentOr: {
@@ -162,10 +167,10 @@ const franchiseSchema = new Schema({
     type: String,
     required: false,
   },
-  pending: {
-    type: Boolean,
+  receiptData: {
+    type: Object,
     required: false,
   },
 });
 
-module.exports = mongoose.model("Franchise", franchiseSchema);
+module.exports = mongoose.model("PendingFranchise", pendingFranchiseSchema);
