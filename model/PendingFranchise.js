@@ -164,7 +164,7 @@ const pendingFranchiseSchema = new Schema({
     required: false,
   },
   paymentOrDate: {
-    type: String,
+    type: "date",
     required: false,
   },
   receiptData: {

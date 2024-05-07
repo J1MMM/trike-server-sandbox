@@ -159,7 +159,7 @@ const franchiseSchema = new Schema({
     required: false,
   },
   paymentOrDate: {
-    type: String,
+    type: "date",
     required: false,
   },
   pending: {
