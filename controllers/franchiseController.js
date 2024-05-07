@@ -171,7 +171,19 @@ const addNewFranchise = async (req, res) => {
     } else {
       latestRefNo = 154687;
     }
-    console.log(latestRefNo);
+    const receiptData = [
+      { label: "Mayor's Permit", price: 385.0 },
+      { label: "Franchise Tax", price: 110.0 },
+      { label: "Health / S.S.F.", price: 63.8 },
+      { label: "Sticker - Color Coding", price: 55.0 },
+      { label: "Docket Fee", price: 27.5 },
+      { label: "Filing Fee", price: 27.5 },
+      { label: "Tin Plate", price: 330.0 },
+      { label: "Registration Fee", price: 15.0 },
+      { label: "Sticker for Garbage", price: 50.0 },
+      { label: "Garbage Fee", price: 50.0 },
+      { label: "Notarial Fee", price: 0.0 },
+    ];
 
     // Create a new franchise document and save it to the database
     const newFranchise = await PendingFranchise.create({
@@ -210,6 +222,7 @@ const addNewFranchise = async (req, res) => {
       createdAt: datenow,
       refNo: latestRefNo,
       transaction: "New Franchise",
+      receiptData: receiptData,
     });
 
     res.status(201).json(latestRefNo);
@@ -219,6 +232,7 @@ const addNewFranchise = async (req, res) => {
   }
 };
 
+// transfer franchise
 const handleFranchiseTransfer = async (req, res) => {
   try {
     const franchiseDetails = req.body;
@@ -283,6 +297,11 @@ const handleFranchiseTransfer = async (req, res) => {
     //   { new: true }
     // );
 
+    const foundFranchise = await Franchise.findOne({
+      _id: franchiseDetails.id,
+      isArchived: false,
+    });
+
     const newFranchise = await PendingFranchise.create({
       receiptData: receiptData,
       refNo: refNo,
@@ -321,6 +340,7 @@ const handleFranchiseTransfer = async (req, res) => {
       DATE_EXPIRED: expireDate,
       createdAt: datenow,
       transaction: "Transfer Franchise",
+      renewedAt: foundFranchise.renewedAt,
     });
 
     await Franchise.findByIdAndUpdate(franchiseDetails.id, { pending: true });
@@ -345,21 +365,6 @@ const handleFranchiseUpdate = async (req, res) => {
     let renewdate = dayjs().tz("Asia/Kuala_Lumpur");
     let expireDate = dateRenewal.add(1, "year");
 
-    const foundFranchise = await Franchise.findOne({
-      _id: franchiseDetails.id,
-    });
-
-    const sameRenewalDate = isSameDay(
-      franchiseDetails.date,
-      foundFranchise.DATE_RENEWAL
-    );
-
-    if (!sameRenewalDate) {
-      foundFranchise.renewedAt = renewdate;
-    }
-
-    foundFranchise.pending = true;
-    await foundFranchise.save();
     // get ref number
     const latestPendingFranchise = await PendingFranchise.find()
       .sort({ refNo: -1 }) // Sort in descending order
@@ -392,6 +397,19 @@ const handleFranchiseUpdate = async (req, res) => {
     // Get the current date and time
     const dateNow = dayjs().tz("Asia/Kuala_Lumpur");
     let monthsPassed = 0;
+
+    const franchiseTax = 110.0;
+    const surcharge = franchiseTax * 0.25;
+    const interest = (franchiseTax + surcharge) * 0.02;
+    // console.log(franchiseTax);
+    // console.log(surcharge);
+    // console.log(interest);
+
+    const foundFranchise = await Franchise.findOne({
+      _id: franchiseDetails.id,
+      isArchived: false,
+    });
+
     const dateRenew = dayjs(foundFranchise?.DATE_RENEWAL).tz(
       "Asia/Kuala_Lumpur"
     );
@@ -400,18 +418,10 @@ const handleFranchiseUpdate = async (req, res) => {
 
     // Check if the expiration date is in the past
     if (expirationDate.isBefore(dateNow)) {
-      // Calculate the number of months that have passed since the expiration date
       monthsPassed = dateNow.diff(expirationDate, "month");
-
       // console.log(`Months passed since expiration: ${monthsPassed}`);
     }
 
-    const franchiseTax = 110.0;
-    const surcharge = franchiseTax * 0.25;
-    const interest = (franchiseTax + surcharge) * 0.02;
-    console.log(franchiseTax);
-    console.log(surcharge);
-    console.log(interest);
     const receiptData = initialreceiptData.map((v) => {
       if (v.label == "Interest") {
         return {
@@ -422,7 +432,11 @@ const handleFranchiseUpdate = async (req, res) => {
         return v;
       }
     });
-    console.log(franchiseDetails);
+
+    const sameRenewalDate = isSameDay(
+      franchiseDetails.date,
+      foundFranchise.DATE_RENEWAL
+    );
 
     const newPendingFranchise = await PendingFranchise.create({
       DATE_RENEWAL: dateRenewal,
@@ -462,11 +476,14 @@ const handleFranchiseUpdate = async (req, res) => {
       MTOP: foundFranchise.MTOP,
       PAID_VIOLATIONS: foundFranchise.PAID_VIOLATIONS,
       previousVersion: foundFranchise._id,
-      renewedAt: foundFranchise.renewedAt,
+      renewedAt: !sameRenewalDate ? renewdate : foundFranchise.renewedAt,
       refNo: refNo,
       receiptData: receiptData,
       transaction: "Franchise Renewal",
     });
+
+    foundFranchise.pending = true;
+    await foundFranchise.save();
 
     res.json({ refNo, receiptData });
   } catch (error) {
@@ -580,6 +597,9 @@ const pendingFranchisePayment = async (req, res) => {
 
     let newFranchiseData;
     const dateNow = dayjs().tz("Asia/Kuala_Lumpur");
+    const paymentOrDate = dayjs(franchiseDetails?.paymentOrDate).tz(
+      "Asia/Kuala_Lumpur"
+    );
 
     const franchiseObj = {
       MTOP: foundPending?.MTOP,
@@ -619,8 +639,8 @@ const pendingFranchisePayment = async (req, res) => {
       DATE_ARCHIVED: foundPending?.DATE_ARCHIVED,
       REMARKS: foundPending?.REMARKS,
       renewedAt: foundPending?.renewedAt,
-      paymentOr: foundPending?.paymentOr,
-      paymentOrDate: foundPending?.paymentOrDate,
+      paymentOr: franchiseDetails?.paymentOr,
+      paymentOrDate: paymentOrDate,
       pending: false,
     };
 
@@ -643,10 +663,10 @@ const pendingFranchisePayment = async (req, res) => {
         {
           _id: foundPending?.previousVersion,
           isArchived: false,
-          DATE_ARCHIVED: dateNow,
         },
         {
           isArchived: true,
+          DATE_ARCHIVED: dateNow,
         }
       );
 
@@ -654,6 +674,8 @@ const pendingFranchisePayment = async (req, res) => {
     }
 
     foundPending.isArchived = true;
+    foundPending.paymentOr = franchiseDetails?.paymentOr;
+    foundPending.paymentOrDate = paymentOrDate;
     await foundPending.save();
     res.json({ newFranchiseData, receiptData: foundPending?.receiptData });
   } catch (err) {
