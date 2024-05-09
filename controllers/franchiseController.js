@@ -642,6 +642,7 @@ const pendingFranchisePayment = async (req, res) => {
       paymentOr: franchiseDetails?.paymentOr,
       paymentOrDate: paymentOrDate,
       pending: false,
+      receiptData: foundPending?.receiptData,
     };
 
     if (foundPending.transaction == "New Franchise") {

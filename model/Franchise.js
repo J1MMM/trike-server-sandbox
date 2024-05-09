@@ -166,6 +166,10 @@ const franchiseSchema = new Schema({
     type: Boolean,
     required: false,
   },
+  receiptData: {
+    type: Object,
+    required: false,
+  },
 });
 
 module.exports = mongoose.model("Franchise", franchiseSchema);
