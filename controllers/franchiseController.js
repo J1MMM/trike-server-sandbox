@@ -172,17 +172,26 @@ const addNewFranchise = async (req, res) => {
       latestRefNo = 154687;
     }
     const receiptData = [
-      { label: "Mayor's Permit", price: 385.0 },
-      { label: "Franchise Tax", price: 110.0 },
-      { label: "Health / S.S.F.", price: 63.8 },
-      { label: "Sticker - Color Coding", price: 55.0 },
-      { label: "Docket Fee", price: 27.5 },
-      { label: "Filing Fee", price: 27.5 },
-      { label: "Tin Plate", price: 330.0 },
-      { label: "Registration Fee", price: 15.0 },
-      { label: "Sticker for Garbage", price: 50.0 },
-      { label: "Garbage Fee", price: 50.0 },
-      { label: "Notarial Fee", price: 0.0 },
+      { label: "Mayor's Permit", price: 385.0, displayPrice: "385.00" },
+      { label: "Franchise Tax", price: 110.0, displayPrice: "110.00" },
+      { label: "Health / S.S.F.", price: 63.8, displayPrice: "63.80" },
+      { label: "Sticker - Color Coding", price: 55.0, displayPrice: "55.00" },
+      { label: "Docket/Filing", price: 55.0, displayPrice: "27.50/27.50" },
+      // { label: "Docket Fee", price: 27.5 },
+      // { label: "Filing Fee", price: 27.5 },
+      {
+        label: "Tin Plate/Registration",
+        price: 345.0,
+        displayPrice: "330.00/15.00",
+      },
+      // { label: "Registration Fee", price: 15.0 },
+      { label: "Sticker for Garbage", price: 50.0, displayPrice: "50.00" },
+      {
+        label: "Garbage/Notarial Fee",
+        price: 50.0,
+        displayPrice: "50.00/0.00",
+      },
+      // { label: "Notarial Fee", price: 0.0 },
     ];
 
     // Create a new franchise document and save it to the database

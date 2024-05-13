@@ -1,12 +1,3 @@
-const bcrypt = require("bcrypt");
-const Class = require("../model/Class");
-const User = require("../model/User");
-const Lesson = require("../model/Lesson");
-const Student = require("../model/Student");
-const { storage } = require("../config/firebase.config");
-const { ref, deleteObject } = require("firebase/storage");
-const nodeMailer = require("nodemailer");
-const ROLES_LIST = require("../config/roles_list");
 const Officer = require("../model/Officer");
 const ViolationList = require("../model/ViolationList");
 const Violation = require("../model/Violation");
