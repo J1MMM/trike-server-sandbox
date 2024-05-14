@@ -392,16 +392,36 @@ const handleFranchiseUpdate = async (req, res) => {
     const initialreceiptData = [
       { key: "1", label: "Mayor's Permit", price: 385.0 },
       { key: "2", label: "Surcharge", price: 192.0 },
-      { key: "3", label: "Franchise Tax", price: 110.0 },
-      { key: "4", label: "Surcharge", price: 27.5 },
+      {
+        key: "3",
+        label: "Franchise/Surcharge",
+        price: 137.5,
+        displayPrice: "110.00/27.50",
+      },
+      // { key: "4", label: "Surcharge", price: 27.5 },
       { key: "5", label: "Interest", price: 0 },
       { key: "6", label: "Health / S.S.F.", price: 63.8 },
-      { key: "7", label: "Sticker", price: 55.0 },
-      { key: "8", label: "Filing Fee", price: 110.0 },
-      { key: "9", label: "Docket Fee", price: 27.5 },
-      { key: "10", label: "Filing Fee", price: 110.5 },
-      { key: "11", label: "Garbage Fee", price: 50.0 },
-      { key: "12", label: "Notarial Fee", price: 100.0 },
+      {
+        key: "7",
+        label: "Sticker / Filing",
+        price: 165.0,
+        displayPrice: "55.00/110.00",
+      },
+      // { key: "8", label: "Filing Fee", price: 110.0 },
+      {
+        key: "9",
+        label: "Docket / Filing",
+        price: 137.5,
+        displayPrice: "27.50/110.00",
+      },
+      // { key: "10", label: "Filing Fee", price: 110.5 },
+      {
+        key: "11",
+        label: "Garbage / Notarial Fee",
+        price: 150.0,
+        displayPrice: "50.00/100.00",
+      },
+      // { key: "12", label: "Notarial Fee", price: 100.0 },
     ];
     // Get the current date and time
     const dateNow = dayjs().tz("Asia/Kuala_Lumpur");
