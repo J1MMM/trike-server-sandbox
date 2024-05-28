@@ -138,6 +138,11 @@ const franchiseSchema = new Schema({
     type: "date",
     required: false,
   },
+
+  LTO_RENEWAL_DATE: {
+    type: "date",
+    required: false,
+  },
   DATE_EXPIRED: {
     type: "date",
     required: false,

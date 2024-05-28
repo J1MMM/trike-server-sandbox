@@ -7,6 +7,39 @@ const PendingFranchise = require("../model/PendingFranchise");
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+function getMonthName(monthNumber) {
+  const monthNames = [
+    "Oct", // 0 maps to October
+    "Jan", // 1 maps to January
+    "Feb", // 2 maps to February
+    "Mar", // 3 maps to March
+    "Apr", // 4 maps to April
+    "May", // 5 maps to May
+    "Jun", // 6 maps to June
+    "Jul", // 7 maps to July
+    "Aug", // 8 maps to August
+    "Sept", // 9 maps to September
+  ];
+
+  if (monthNumber < 0 || monthNumber > 9) {
+    return "Invalid month number";
+  }
+
+  return `${monthNames[monthNumber]}`;
+}
+
+function getLastDigit(plateNumber) {
+  // Iterate from the end of the string to the beginning
+  for (let i = plateNumber.length - 1; i >= 0; i--) {
+    // Check if the current character is a digit
+    if (!isNaN(plateNumber[i]) && plateNumber[i] !== " ") {
+      return plateNumber[i];
+    }
+  }
+  // If no digit is found, return an appropriate message or value
+  return "No digit found";
+}
+
 function isSameDay(date1, date2) {
   // Parse strings to Date objects if inputs are strings
   if (typeof date1 === "string") {
@@ -42,12 +75,57 @@ function findDuplicateMTOP(arrayOfObjects) {
 
   return duplicates;
 }
+function getRenewalDate(plateNumber, lastRenewalDate = new Date()) {
+  if (!plateNumber || !lastRenewalDate) {
+    return null;
+  }
+  // Extract the last digit from the plate number
+  const lastDigit = plateNumber.match(/\d(?=\D*$)/);
+  if (!lastDigit) {
+    return null;
+  }
+
+  // Map last digit to corresponding month (1-based index)
+  const monthMap = {
+    0: 10, // October
+    1: 1, // January
+    2: 2, // February
+    3: 3, // March
+    4: 4, // April
+    5: 5, // May
+    6: 6, // June
+    7: 7, // July
+    8: 8, // August
+    9: 9, // September
+  };
+
+  const month = monthMap[lastDigit[0]];
+  const renewalBaseDate = new Date(lastRenewalDate);
+  const nextYear = renewalBaseDate.getFullYear() + 1;
+
+  // Create a date for the first day of the next month
+  const firstDayOfNextMonth = new Date(nextYear, month, 1);
+  // Subtract one day to get the last day of the target month
+  const lastDayOfMonth = new Date(firstDayOfNextMonth - 1);
+
+  return lastDayOfMonth;
+}
 
 const getAllFranchise = async (req, res) => {
   try {
     const rows = await Franchise.find({ isArchived: false }).sort({
       MTOP: "asc",
     });
+
+    // const updatedRows = rows.map((row) => {
+    //   const lto_date = getRenewalDate(row.PLATE_NO, row.DATE_RENEWAL);
+
+    //   row.LTO_RENEWAL_DATE = lto_date;
+    //   return row;
+    // });
+
+    // await Promise.all(updatedRows.map((row) => row.save()));
+
     const totalRows = await Franchise.countDocuments({ isArchived: false });
 
     // console.log(findDuplicateMTOP(rows));
@@ -164,7 +242,7 @@ const addNewFranchise = async (req, res) => {
 
     let latestRefNo;
 
-    console.log(latestPendingFranchise);
+    // console.log(latestPendingFranchise);
     if (latestPendingFranchise.length > 0) {
       // Convert refNo to a number
       latestRefNo = parseInt(latestPendingFranchise[0].refNo) + 1;
@@ -193,6 +271,8 @@ const addNewFranchise = async (req, res) => {
       },
       // { label: "Notarial Fee", price: 0.0 },
     ];
+
+    const lto_date = getRenewalDate(franchiseDetails.plateno, dateRenewal);
 
     // Create a new franchise document and save it to the database
     const newFranchise = await PendingFranchise.create({
@@ -232,6 +312,7 @@ const addNewFranchise = async (req, res) => {
       refNo: latestRefNo,
       transaction: "New Franchise",
       receiptData: receiptData,
+      LTO_RENEWAL_DATE: lto_date,
     });
 
     res.status(201).json(latestRefNo);
@@ -350,6 +431,7 @@ const handleFranchiseTransfer = async (req, res) => {
       createdAt: datenow,
       transaction: "Transfer Franchise",
       renewedAt: foundFranchise.renewedAt,
+      LTO_RENEWAL_DATE: getRenewalDate(franchiseDetails.plateno, dateRenewal),
     });
 
     await Franchise.findByIdAndUpdate(franchiseDetails.id, { pending: true });
@@ -388,48 +470,64 @@ const handleFranchiseUpdate = async (req, res) => {
       refNo = 154687;
     }
 
-    //generate receipt data
-    const initialreceiptData = [
-      { key: "1", label: "Mayor's Permit", price: 385.0 },
-      { key: "2", label: "Surcharge", price: 192.0 },
-      {
-        key: "3",
-        label: "Franchise/Surcharge",
-        price: 137.5,
-        displayPrice: "110.00/27.50",
-      },
-      // { key: "4", label: "Surcharge", price: 27.5 },
-      { key: "5", label: "Interest", price: 0 },
-      { key: "6", label: "Health / S.S.F.", price: 63.8 },
-      {
-        key: "7",
-        label: "Sticker / Filing",
-        price: 165.0,
-        displayPrice: "55.00/110.00",
-      },
-      // { key: "8", label: "Filing Fee", price: 110.0 },
-      {
-        key: "9",
-        label: "Docket / Filing",
-        price: 137.5,
-        displayPrice: "27.50/110.00",
-      },
-      // { key: "10", label: "Filing Fee", price: 110.5 },
-      {
-        key: "11",
-        label: "Garbage / Notarial Fee",
-        price: 150.0,
-        displayPrice: "50.00/100.00",
-      },
-      // { key: "12", label: "Notarial Fee", price: 100.0 },
-    ];
+    let mayors_permit = 385.0;
+    let surcharge1 = 0;
+    let franchise = 110.0;
+    let surcharge2 = 0;
+    let interest = 0;
+    let health = 63.8;
+    let sticker = 55;
+    let docket = 27.5;
+    let filing = 27.5;
+    let garbage = 50.0;
+    // //generate receipt data
+    // const initialreceiptData = [
+    //   { key: "1", label: "Mayor's Permit", price: mayors_permit },
+    //   { key: "2", label: "Surcharge", price: surcharge1 },
+    //   {
+    //     key: "3",
+    //     label: "Franchise",
+    //     price: franchise,
+    //   },
+    //   {
+    //     key: "4",
+    //     label: "Surcharge",
+    //     price: surcharge2,
+    //   },
+    //   { key: "5", label: "Interest", price: interest },
+    //   { key: "6", label: "Health / S.S.F.", price: health },
+    //   {
+    //     key: "7",
+    //     label: "Sticker / Docket Feee",
+    //     price: sticker + docket,
+    //     displayPrice: `${sticker.toLocaleString("en-PH", {
+    //       style: "currency",
+    //       currency: "PHP",
+    //     })}/${docket.toLocaleString("en-PH", {
+    //       style: "currency",
+    //       currency: "PHP",
+    //     })}`,
+    //   },
+    //   {
+    //     key: "11",
+    //     label: "Filing/Garbage/Notarial",
+    //     price: filing + garbage,
+    //     displayPrice: `${filing.toLocaleString("en-PH", {
+    //       style: "currency",
+    //       currency: "PHP",
+    //     })}/${garbage.toLocaleString("en-PH", {
+    //       style: "currency",
+    //       currency: "PHP",
+    //     })}`,
+    //   },
+    // ];
     // Get the current date and time
     const dateNow = dayjs().tz("Asia/Kuala_Lumpur");
-    let monthsPassed = 0;
+    let monthsPassed = undefined;
 
-    const franchiseTax = 110.0;
-    const surcharge = franchiseTax * 0.25;
-    const interest = (franchiseTax + surcharge) * 0.02;
+    // const franchiseTax = 110.0;
+    // const surcharge = franchiseTax * 0.25;
+    // const interest = (franchiseTax + surcharge) * 0.02;
     // console.log(franchiseTax);
     // console.log(surcharge);
     // console.log(interest);
@@ -439,28 +537,98 @@ const handleFranchiseUpdate = async (req, res) => {
       isArchived: false,
     });
 
-    const dateRenew = dayjs(foundFranchise?.DATE_RENEWAL).tz(
-      "Asia/Kuala_Lumpur"
+    const dateRenew = dayjs(franchiseDetails?.date).tz("Asia/Kuala_Lumpur");
+    const lto_date = getRenewalDate(
+      franchiseDetails?.plateno,
+      foundFranchise?.DATE_RENEWAL
     );
     // Get the expiration date from foundFranchise (assuming DATE_EXPIRED is the property)
-    const expirationDate = dateRenew.add(1, "year");
+    const expirationDate = dayjs(lto_date).tz("Asia/Kuala_Lumpur");
 
     // Check if the expiration date is in the past
-    if (expirationDate.isBefore(dateNow)) {
-      monthsPassed = dateNow.diff(expirationDate, "month");
+    if (expirationDate.isBefore(dateRenew)) {
+      monthsPassed = dateRenew.diff(expirationDate, "month") + 1;
       // console.log(`Months passed since expiration: ${monthsPassed}`);
     }
 
-    const receiptData = initialreceiptData.map((v) => {
-      if (v.label == "Interest") {
-        return {
-          ...v,
-          price: monthsPassed == 0 ? interest : interest * monthsPassed,
-        };
-      } else {
-        return v;
+    console.log(monthsPassed);
+    if (monthsPassed < 12 && monthsPassed >= 1) {
+      surcharge1 = mayors_permit * 0.5;
+      surcharge2 = franchise * 0.25;
+      interest = surcharge2 * 0.1 * monthsPassed;
+    }
+    if (monthsPassed >= 12) {
+      let months_1year_passed = monthsPassed - 12;
+      mayors_permit *= 2;
+      health *= 2;
+      sticker *= 2;
+      docket *= 2;
+      filing *= 2;
+      garbage *= 2;
+
+      surcharge1 = mayors_permit * 0.5;
+      surcharge2 = franchise * 0.25;
+
+      interest = surcharge2 * 0.1 * 12;
+      if (months_1year_passed >= 1) {
+        interest += surcharge2 * 0.2 * months_1year_passed;
       }
-    });
+
+      franchise *= 2;
+      surcharge2 = franchise * 0.25;
+    }
+
+    const receiptData = [
+      { key: "1", label: "Mayor's Permit", price: mayors_permit },
+      { key: "2", label: "Surcharge", price: surcharge1 },
+      {
+        key: "3",
+        label: "Franchise",
+        price: franchise,
+      },
+      {
+        key: "4",
+        label: "Surcharge",
+        price: surcharge2,
+      },
+      { key: "5", label: "Interest", price: interest },
+      { key: "6", label: "Health / S.S.F.", price: health },
+      {
+        key: "7",
+        label: "Sticker / Docket Fee",
+        price: sticker + docket,
+        displayPrice: `${sticker.toLocaleString("en-PH", {
+          style: "currency",
+          currency: "PHP",
+        })}/${docket.toLocaleString("en-PH", {
+          style: "currency",
+          currency: "PHP",
+        })}`,
+      },
+      {
+        key: "11",
+        label: "Filing/Garbage/Notarial",
+        price: filing + garbage,
+        displayPrice: `${filing.toLocaleString("en-PH", {
+          style: "currency",
+          currency: "PHP",
+        })}/${garbage.toLocaleString("en-PH", {
+          style: "currency",
+          currency: "PHP",
+        })}`,
+      },
+    ];
+
+    // const receiptData = initialreceiptData.map((v) => {
+    //   if (v.label == "Interest") {
+    //     return {
+    //       ...v,
+    //       price: monthsPassed == 0 ? interest : interest * monthsPassed,
+    //     };
+    //   } else {
+    //     return v;
+    //   }
+    // });
 
     const sameRenewalDate = isSameDay(
       franchiseDetails.date,
@@ -509,6 +677,7 @@ const handleFranchiseUpdate = async (req, res) => {
       refNo: refNo,
       receiptData: receiptData,
       transaction: "Franchise Renewal",
+      LTO_RENEWAL_DATE: foundFranchise.LTO_RENEWAL_DATE,
     });
 
     foundFranchise.pending = true;
@@ -601,7 +770,9 @@ const getFranchisePending = async (req, res) => {
 
 const getFranchisePendingPaid = async (req, res) => {
   try {
-    const result = await PendingFranchise.find({ isArchived: true });
+    const result = await PendingFranchise.find({ isArchived: true }).sort({
+      refNo: "desc",
+    });
 
     res.json(result);
   } catch (err) {
@@ -672,6 +843,7 @@ const pendingFranchisePayment = async (req, res) => {
       paymentOrDate: paymentOrDate,
       pending: false,
       receiptData: foundPending?.receiptData,
+      LTO_RENEWAL_DATE: foundPending.LTO_RENEWAL_DATE,
     };
 
     if (foundPending.transaction == "New Franchise") {
