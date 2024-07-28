@@ -62,6 +62,10 @@ const franchiseSchema = new Schema({
     type: String,
     required: false,
   },
+  MAKE: {
+    type: String,
+    required: false,
+  },
   MODEL: {
     type: String,
     required: false,

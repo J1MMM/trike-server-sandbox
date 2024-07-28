@@ -12,6 +12,7 @@ const {
   getFranchisePending,
   pendingFranchisePayment,
   getFranchisePendingPaid,
+  cancelOR,
 } = require("../../controllers/franchiseController");
 
 router
@@ -26,6 +27,7 @@ router.route("/update").post(handleFranchiseUpdate);
 router.route("/analytics").get(getAnalytics);
 
 router.route("/pending").get(getFranchisePending).post(pendingFranchisePayment);
+router.route("/cancel").post(cancelOR);
 router.route("/paid").get(getFranchisePendingPaid);
 
 module.exports = router;

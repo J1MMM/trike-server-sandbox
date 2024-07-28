@@ -63,6 +63,10 @@ const pendingFranchiseSchema = new Schema({
     type: String,
     required: false,
   },
+  MAKE: {
+    type: String,
+    required: false,
+  },
   MODEL: {
     type: String,
     required: false,

@@ -204,6 +204,7 @@ const getAllAvailableMTOPs = async (req, res) => {
 const addNewFranchise = async (req, res) => {
   try {
     const franchiseDetails = req.body;
+    console.log(franchiseDetails);
     if (
       !franchiseDetails.mtop ||
       !franchiseDetails.date ||
@@ -213,6 +214,7 @@ const addNewFranchise = async (req, res) => {
       !franchiseDetails.contact ||
       !franchiseDetails.drivername ||
       !franchiseDetails.driveraddress ||
+      !franchiseDetails.make ||
       !franchiseDetails.model ||
       !franchiseDetails.plateno ||
       !franchiseDetails.motorno ||
@@ -289,6 +291,7 @@ const addNewFranchise = async (req, res) => {
       DRIVERS_NO: franchiseDetails.contact2,
       DRIVERS_SEX: franchiseDetails.driverSex,
       DRIVERS_LICENSE_NO: franchiseDetails.driverlicenseno,
+      MAKE: franchiseDetails.make,
       MODEL: franchiseDetails.model,
       PLATE_NO: franchiseDetails.plateno,
       MOTOR_NO: franchiseDetails.motorno,
@@ -409,6 +412,7 @@ const handleFranchiseTransfer = async (req, res) => {
       DRIVERS_NO: franchiseDetails.contact2,
       DRIVERS_SEX: franchiseDetails.driverSex,
       DRIVERS_LICENSE_NO: franchiseDetails.driverlicenseno,
+      MAKE: franchiseDetails.make,
       MODEL: franchiseDetails.model,
       PLATE_NO: franchiseDetails.plateno,
       MOTOR_NO: franchiseDetails.motorno,
@@ -648,6 +652,7 @@ const handleFranchiseUpdate = async (req, res) => {
       DRIVERS_NO: franchiseDetails.contact2,
       DRIVERS_SEX: franchiseDetails.driverSex,
       DRIVERS_LICENSE_NO: franchiseDetails.driverlicenseno,
+      MAKE: franchiseDetails.make,
       MODEL: franchiseDetails.model,
       PLATE_NO: franchiseDetails.plateno,
       MOTOR_NO: franchiseDetails.motorno,
@@ -817,6 +822,7 @@ const pendingFranchisePayment = async (req, res) => {
       OR: foundPending?.OR,
       CR: foundPending?.CR,
       DRIVERS_LICENSE_NO: foundPending?.DRIVERS_LICENSE_NO,
+      MAKE: foundPending?.MAKE,
       MODEL: foundPending?.MODEL,
       MOTOR_NO: foundPending?.MOTOR_NO,
       CHASSIS_NO: foundPending?.CHASSIS_NO,
@@ -886,6 +892,35 @@ const pendingFranchisePayment = async (req, res) => {
   }
 };
 
+const cancelOR = async (req, res) => {
+  try {
+    const franchiseDetails = req.body;
+    if (!franchiseDetails)
+      return res
+        .status(400)
+        .json({ message: "Important franchise details are required." });
+
+    const foundFranchise = await Franchise.findOne({
+      MTOP: franchiseDetails.mtop,
+      isArchived: false,
+      pending: true,
+    });
+
+    if (foundFranchise) {
+      foundFranchise.pending = false;
+
+      await foundFranchise.save();
+    }
+
+    await PendingFranchise.findByIdAndDelete(franchiseDetails.id);
+
+    res.json({ message: "ok" });
+  } catch (err) {
+    console.error("Error fetching data:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getAllFranchise,
   getAllArchived,
@@ -898,4 +933,5 @@ module.exports = {
   getFranchisePending,
   pendingFranchisePayment,
   getFranchisePendingPaid,
+  cancelOR,
 };
