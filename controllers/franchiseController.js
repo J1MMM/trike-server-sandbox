@@ -686,6 +686,7 @@ const handleFranchiseUpdate = async (req, res) => {
     });
 
     foundFranchise.pending = true;
+    foundFranchise.receiptData = receiptData;
     await foundFranchise.save();
 
     res.json({ refNo, receiptData });
