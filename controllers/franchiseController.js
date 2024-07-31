@@ -438,7 +438,11 @@ const handleFranchiseTransfer = async (req, res) => {
       LTO_RENEWAL_DATE: getRenewalDate(franchiseDetails.plateno, dateRenewal),
     });
 
-    await Franchise.findByIdAndUpdate(franchiseDetails.id, { pending: true });
+    await Franchise.findByIdAndUpdate(franchiseDetails.id, { pending: true,
+
+          receiptData:receiptData,
+    transaction:"Transfer Franchise"
+     });
 
     res.status(201).json({ refNo, receiptData });
   } catch (error) {
@@ -687,6 +691,7 @@ const handleFranchiseUpdate = async (req, res) => {
 
     foundFranchise.pending = true;
     foundFranchise.receiptData = receiptData;
+    foundFranchise.transaction ="Franchise Renewal"
     await foundFranchise.save();
 
     res.json({ refNo, receiptData });
