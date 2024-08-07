@@ -295,7 +295,7 @@ const updateViolationPaidStatus = async (req, res) => {
         datePaid: datenow,
         payor: violationDetails.name,
         remarks: violationDetails.remarks,
-        remarks: violationDetails.collectingOfficer,
+        collectingOfficer: violationDetails.collectingOfficer,
       },
       { new: true }
     );
