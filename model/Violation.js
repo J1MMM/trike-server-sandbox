@@ -87,6 +87,10 @@ const violationSchema = new Schema({
     type: String,
     required: false,
   },
+  collectingOfficer: {
+    type: String,
+    required: false,
+  },
   datePaid: {
     type: "date",
     required: false,
