@@ -289,6 +289,7 @@ const updateViolationPaidStatus = async (req, res) => {
       {
         paid: true,
         or: violationDetails.or,
+        ortf: violationDetails.ortf,
         orDate: violationDetails.orDate,
         receiptNo: violationDetails.or,
         datePaid: datenow,

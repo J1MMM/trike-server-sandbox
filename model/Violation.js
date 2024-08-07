@@ -59,6 +59,10 @@ const violationSchema = new Schema({
     type: String,
     required: false,
   },
+  ortf: {
+    type: String,
+    required: false,
+  },
   orDate: {
     type: "date",
     required: false,
