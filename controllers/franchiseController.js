@@ -900,6 +900,7 @@ const pendingFranchisePayment = async (req, res) => {
     foundPending.isArchived = true;
     foundPending.paymentOr = franchiseDetails?.paymentOr;
     foundPending.paymentOrDate = paymentOrDate;
+    foundPending.collectingOfficer = franchiseDetails?.collectingOfficer;
     await foundPending.save();
     res.json({ newFranchiseData, receiptData: foundPending?.receiptData });
   } catch (err) {
