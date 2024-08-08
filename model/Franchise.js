@@ -179,6 +179,14 @@ const franchiseSchema = new Schema({
     type: Object,
     required: false,
   },
+  processedBy: {
+    type: String,
+    required: false,
+  },
+  collectingOfficer: {
+    type: String,
+    required: false,
+  },
 });
 
 module.exports = mongoose.model("Franchise", franchiseSchema);

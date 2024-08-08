@@ -316,6 +316,8 @@ const addNewFranchise = async (req, res) => {
       transaction: "New Franchise",
       receiptData: receiptData,
       LTO_RENEWAL_DATE: lto_date,
+      processedBy: franchiseDetails?.processedBy,
+      collectingOfficer: franchiseDetails?.collectingOfficer,
     });
 
     res.status(201).json(latestRefNo);
@@ -436,13 +438,16 @@ const handleFranchiseTransfer = async (req, res) => {
       transaction: "Transfer Franchise",
       renewedAt: foundFranchise.renewedAt,
       LTO_RENEWAL_DATE: getRenewalDate(franchiseDetails.plateno, dateRenewal),
+      processedBy: franchiseDetails?.processedBy,
+      collectingOfficer: franchiseDetails?.collectingOfficer,
     });
 
-    await Franchise.findByIdAndUpdate(franchiseDetails.id, { pending: true,
+    await Franchise.findByIdAndUpdate(franchiseDetails.id, {
+      pending: true,
 
-          receiptData:receiptData,
-    transaction:"Transfer Franchise"
-     });
+      receiptData: receiptData,
+      transaction: "Transfer Franchise",
+    });
 
     res.status(201).json({ refNo, receiptData });
   } catch (error) {
@@ -687,11 +692,13 @@ const handleFranchiseUpdate = async (req, res) => {
       receiptData: receiptData,
       transaction: "Franchise Renewal",
       LTO_RENEWAL_DATE: foundFranchise.LTO_RENEWAL_DATE,
+      processedBy: franchiseDetails?.processedBy,
+      collectingOfficer: franchiseDetails?.collectingOfficer,
     });
 
     foundFranchise.pending = true;
     foundFranchise.receiptData = receiptData;
-    foundFranchise.transaction ="Franchise Renewal"
+    foundFranchise.transaction = "Franchise Renewal";
     await foundFranchise.save();
 
     res.json({ refNo, receiptData });
@@ -856,6 +863,8 @@ const pendingFranchisePayment = async (req, res) => {
       pending: false,
       receiptData: foundPending?.receiptData,
       LTO_RENEWAL_DATE: foundPending.LTO_RENEWAL_DATE,
+      processedBy: franchiseDetails?.processedBy,
+      collectingOfficer: franchiseDetails?.collectingOfficer,
     };
 
     if (foundPending.transaction == "New Franchise") {
