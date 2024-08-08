@@ -444,9 +444,9 @@ const handleFranchiseTransfer = async (req, res) => {
 
     await Franchise.findByIdAndUpdate(franchiseDetails.id, {
       pending: true,
-
       receiptData: receiptData,
       transaction: "Transfer Franchise",
+      processedBy: franchiseDetails?.processedBy,
     });
 
     res.status(201).json({ refNo, receiptData });
@@ -699,6 +699,7 @@ const handleFranchiseUpdate = async (req, res) => {
     foundFranchise.pending = true;
     foundFranchise.receiptData = receiptData;
     foundFranchise.transaction = "Franchise Renewal";
+    foundFranchise.processedBy = franchiseDetails?.processedBy;
     await foundFranchise.save();
 
     res.json({ refNo, receiptData });
