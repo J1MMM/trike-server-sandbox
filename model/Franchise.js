@@ -179,11 +179,20 @@ const franchiseSchema = new Schema({
     type: Object,
     required: false,
   },
+
   processedBy: {
     type: String,
     required: false,
   },
   collectingOfficer: {
+    type: String,
+    required: false,
+  },
+  MPreceiptData: {
+    type: Object,
+    required: false,
+  },
+  MPpaymentOr: {
     type: String,
     required: false,
   },

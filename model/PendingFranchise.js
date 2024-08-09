@@ -191,6 +191,14 @@ const pendingFranchiseSchema = new Schema({
     type: String,
     required: false,
   },
+  MPreceiptData: {
+    type: Object,
+    required: false,
+  },
+  MPpaymentOr: {
+    type: String,
+    required: false,
+  },
 });
 
 module.exports = mongoose.model("PendingFranchise", pendingFranchiseSchema);

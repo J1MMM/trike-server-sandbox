@@ -869,7 +869,11 @@ const pendingFranchisePayment = async (req, res) => {
     };
 
     if (foundPending.transaction == "New Franchise") {
-      newFranchiseData = await Franchise.create(franchiseObj);
+      newFranchiseData = await Franchise.create({
+        ...franchiseObj,
+        MPreceiptData: foundPending?.receiptData,
+        MPpaymentOr: franchiseDetails?.paymentOr,
+      });
     }
 
     if (foundPending.transaction == "Franchise Renewal") {
@@ -878,7 +882,11 @@ const pendingFranchisePayment = async (req, res) => {
         isArchived: false,
       });
 
-      await foundFranchise.set(franchiseObj);
+      await foundFranchise.set({
+        ...franchiseObj,
+        MPreceiptData: foundPending?.receiptData,
+        MPpaymentOr: franchiseDetails?.paymentOr,
+      });
       newFranchiseData = await foundFranchise.save();
     }
 
