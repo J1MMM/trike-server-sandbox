@@ -117,14 +117,14 @@ const getAllFranchise = async (req, res) => {
       MTOP: "asc",
     });
 
-    // const updatedRows = rows.map((row) => {
-    //   const lto_date = getRenewalDate(row.PLATE_NO, row.DATE_RENEWAL);
+    const updatedRows = rows.map((row) => {
+      const lto_date = getRenewalDate(row.PLATE_NO, row.DATE_RENEWAL);
 
-    //   row.LTO_RENEWAL_DATE = lto_date;
-    //   return row;
-    // });
+      row.LTO_RENEWAL_DATE = lto_date;
+      return row;
+    });
 
-    // await Promise.all(updatedRows.map((row) => row.save()));
+    await Promise.all(updatedRows.map((row) => row.save()));
 
     const totalRows = await Franchise.countDocuments({ isArchived: false });
 
