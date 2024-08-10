@@ -440,6 +440,8 @@ const handleFranchiseTransfer = async (req, res) => {
       LTO_RENEWAL_DATE: getRenewalDate(franchiseDetails.plateno, dateRenewal),
       processedBy: franchiseDetails?.processedBy,
       collectingOfficer: franchiseDetails?.collectingOfficer,
+      MPreceiptData: franchiseDetails?.MPreceiptData,
+      MPpaymentOr: franchiseDetails?.MPpaymentOr,
     });
 
     await Franchise.findByIdAndUpdate(franchiseDetails.id, {
@@ -902,7 +904,11 @@ const pendingFranchisePayment = async (req, res) => {
         }
       );
 
-      newFranchiseData = await Franchise.create(franchiseObj);
+      newFranchiseData = await Franchise.create({
+        ...franchiseObj,
+        MPreceiptData: foundPending?.MPreceiptData,
+        MPpaymentOr: foundPending?.MPpaymentOr,
+      });
     }
 
     foundPending.isArchived = true;
