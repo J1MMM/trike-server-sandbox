@@ -570,8 +570,9 @@ const handleFranchiseUpdate = async (req, res) => {
     if (monthsPassed < 12 && monthsPassed >= 1) {
       surcharge1 = mayors_permit * 0.5;
       surcharge2 = franchise * 0.25;
-      interest = surcharge2 * 0.1 * monthsPassed;
+      interest = surcharge2 * 0.2 * monthsPassed;
     }
+
     if (monthsPassed >= 12) {
       let months_1year_passed = monthsPassed - 12;
       mayors_permit *= 2;
@@ -581,8 +582,8 @@ const handleFranchiseUpdate = async (req, res) => {
       filing *= 2;
       garbage *= 2;
 
-      surcharge1 = mayors_permit * 0.5;
-      surcharge2 = franchise * 0.25;
+      surcharge1 = mayors_permit * 0.25;
+      surcharge2 = franchise * 0.125;
 
       interest = surcharge2 * 0.1 * 12;
       if (months_1year_passed >= 1) {
@@ -590,7 +591,7 @@ const handleFranchiseUpdate = async (req, res) => {
       }
 
       franchise *= 2;
-      surcharge2 = franchise * 0.25;
+      surcharge2 = franchise * 0.125;
     }
 
     const receiptData = [
