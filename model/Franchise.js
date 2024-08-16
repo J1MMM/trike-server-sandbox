@@ -196,6 +196,11 @@ const franchiseSchema = new Schema({
     type: String,
     required: false,
   },
+
+  transaction: {
+    type: String,
+    required: false,
+  },
 });
 
 module.exports = mongoose.model("Franchise", franchiseSchema);
