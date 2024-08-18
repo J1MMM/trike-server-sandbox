@@ -201,6 +201,22 @@ const franchiseSchema = new Schema({
     type: String,
     required: false,
   },
+  newOwner: {
+    type: String,
+    required: false,
+  },
+  newDriver: {
+    type: String,
+    required: false,
+  },
+  newMotor: {
+    type: String,
+    required: false,
+  },
+  newToda: {
+    type: String,
+    required: false,
+  },
 });
 
 module.exports = mongoose.model("Franchise", franchiseSchema);

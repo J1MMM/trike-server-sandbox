@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 
 const sendMail = async (req, res) => {
   const { email } = req.body.data;
-  console.log("reset");
   if (!email) return res.status(400).json({ message: "Email is required" });
 
   try {
@@ -101,7 +100,6 @@ const checkToken = async (req, res) => {
 
 const updatePwd = async (req, res) => {
   const { pwd, token } = req.body;
-  console.log(req.body);
   if (!pwd || !token)
     return res.status(400).json({ message: "password and token are required" });
 

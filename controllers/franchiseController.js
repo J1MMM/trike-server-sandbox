@@ -128,8 +128,6 @@ const getAllFranchise = async (req, res) => {
 
     const totalRows = await Franchise.countDocuments({ isArchived: false });
 
-    // console.log(findDuplicateMTOP(rows));
-
     res.json({ rows, totalRows });
   } catch (err) {
     console.error("Error fetching data:", err);
@@ -204,7 +202,6 @@ const getAllAvailableMTOPs = async (req, res) => {
 const addNewFranchise = async (req, res) => {
   try {
     const franchiseDetails = req.body;
-    console.log(franchiseDetails);
     if (
       !franchiseDetails.mtop ||
       !franchiseDetails.date ||
@@ -244,7 +241,6 @@ const addNewFranchise = async (req, res) => {
 
     let latestRefNo;
 
-    // console.log(latestPendingFranchise);
     if (latestPendingFranchise.length > 0) {
       // Convert refNo to a number
       latestRefNo = parseInt(latestPendingFranchise[0].refNo) + 1;
@@ -449,6 +445,10 @@ const handleFranchiseTransfer = async (req, res) => {
       receiptData: receiptData,
       transaction: "Transfer Franchise",
       processedBy: franchiseDetails?.processedBy,
+      newOwner: franchiseDetails.newOwner,
+      newDriver: franchiseDetails.newDriver,
+      newMotor: franchiseDetails.newMotor,
+      newToda: franchiseDetails.newToda,
     });
 
     res.status(201).json({ refNo, receiptData });
@@ -543,9 +543,6 @@ const handleFranchiseUpdate = async (req, res) => {
     // const franchiseTax = 110.0;
     // const surcharge = franchiseTax * 0.25;
     // const interest = (franchiseTax + surcharge) * 0.02;
-    // console.log(franchiseTax);
-    // console.log(surcharge);
-    // console.log(interest);
 
     const foundFranchise = await Franchise.findOne({
       _id: franchiseDetails.id,
@@ -563,10 +560,8 @@ const handleFranchiseUpdate = async (req, res) => {
     // Check if the expiration date is in the past
     if (expirationDate.isBefore(dateRenew)) {
       monthsPassed = dateRenew.diff(expirationDate, "month") + 1;
-      // console.log(`Months passed since expiration: ${monthsPassed}`);
     }
 
-    console.log(monthsPassed);
     if (monthsPassed < 12 && monthsPassed >= 1) {
       surcharge1 = mayors_permit * 0.5;
       surcharge2 = franchise * 0.25;
@@ -944,7 +939,7 @@ const cancelOR = async (req, res) => {
       await foundFranchise.save();
     }
 
-    await PendingFranchise.findByIdAndDelete(franchiseDetails.id);
+    await PendingFranchise.deleteOne({ previousVersion: franchiseDetails.id });
 
     res.json({ message: "ok" });
   } catch (err) {

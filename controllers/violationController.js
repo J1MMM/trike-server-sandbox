@@ -177,19 +177,16 @@ const updateViolation = async (req, res) => {
     //check if franchises exist sometimes it already on archive
     if (violationDetails?.franchiseNo) {
       // if franchise number is exist
-      console.log("have franchice");
       if (prevViolationDetails.franchiseNo) {
         // if the franchise number of prev violation details is exist
         if (prevViolationDetails.franchiseNo != violationDetails?.franchiseNo) {
           // if franchise number is changed
-          console.log("franchise number changed");
           prevFranchise.COMPLAINT = removeOneItemPerMatch(
             prevViolations,
             prevFranchise.COMPLAINT
           );
           newFranchise.COMPLAINT = [...newFranchise.COMPLAINT, ...violations];
         } else {
-          console.log("franchise number same as old");
           // if franchiseNo is same as old violationDetails
           const updatedComplaints = removeOneItemPerMatch(
             prevViolations,
@@ -200,7 +197,6 @@ const updateViolation = async (req, res) => {
         }
       } else {
         // if old violation details have'nt franchise number then new updated had
-        console.log("old record have'nt franchise number then now it have");
 
         newFranchise.COMPLAINT = [...newFranchise.COMPLAINT, ...violations];
       }
@@ -225,7 +221,6 @@ const updateViolation = async (req, res) => {
 
     if (newFranchise) await newFranchise.save();
     if (prevFranchise) await prevFranchise.save();
-    console.log("====================================================");
 
     await prevViolationDetails.set(violationDetails);
     await prevViolationDetails.save();

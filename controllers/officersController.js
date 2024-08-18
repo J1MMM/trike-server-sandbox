@@ -14,7 +14,6 @@ const cron = require("cron");
 const resetOfficerApprehension = async () => {
   try {
     await Officer.updateMany({}, { $set: { apprehended: 0 } });
-    console.log("apprehended reset");
   } catch (error) {
     console.log(error);
   }
@@ -95,7 +94,6 @@ const updateOfficer = async (req, res) => {
       },
       { new: true }
     );
-    console.log(updatedOfficer); // Corrected variable name for logging
     res.status(201).json(updatedOfficer);
   } catch (error) {
     console.log(error);
@@ -104,7 +102,6 @@ const updateOfficer = async (req, res) => {
 };
 
 const deleteOfficer = async (req, res) => {
-  console.log(req.body.id);
   if (!req.body.id) return res.sendStatus(400);
   try {
     await Officer.deleteOne({ _id: req.body.id });
