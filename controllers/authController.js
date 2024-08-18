@@ -4,16 +4,22 @@ const User = require("../model/User");
 
 const handleLogin = async (req, res) => {
   const { email, pwd } = req.body;
+
   if (!email || !pwd)
     return res.status(400).json({ message: "Email and Password are required" });
 
-  const foundUser = await User.findOne({ email: email, archive: false }).exec();
-  if (!foundUser) return res.sendStatus(401);
-
-  const match = await bcrypt.compare(pwd, foundUser.password);
-  if (!match)
-    return res.status(401).json({ message: `Incorrect email or password` });
   try {
+    const foundUser = await User.findOne({
+      email: email,
+      archive: false,
+    }).exec();
+    if (!foundUser)
+      return res.status(401).json({ message: "Unauthorized: User not found" });
+
+    const match = await bcrypt.compare(pwd, foundUser.password);
+    if (!match)
+      return res.status(401).json({ message: "Incorrect email or password" });
+
     const roles = Object.values(foundUser.roles).filter(Boolean);
     const fullname = `${foundUser.firstname} ${foundUser.lastname}`;
     const id = foundUser._id;
@@ -31,18 +37,6 @@ const handleLogin = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // if user allreafy login
-    const rToken = foundUser.refreshToken;
-    // if (rToken != "") {
-    //   res.cookie("jwt", rToken, {
-    //     httpOnly: true,
-    //     maxAge: 24 * 60 * 60 * 1000,
-    //     sameSite: "None",
-    //     secure: true,
-    //   }); //secure: true
-    //   return res.json({ roles, accessToken, fullname });
-    // }
-
     const refreshToken = jwt.sign(
       { email: foundUser.email },
       process.env.REFRESH_TOKEN_SECRET,
@@ -50,17 +44,20 @@ const handleLogin = async (req, res) => {
     );
 
     foundUser.refreshToken = refreshToken;
-    const result = await foundUser.save();
-    //response
+    await foundUser.save();
+
+    const isProduction = process.env.NODE_ENV === "production";
     res.cookie("jwt", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "None",
-      secure: true,
-    }); //secure: true
+      sameSite: isProduction ? "None" : "Lax", // Adjust SameSite attribute for dev
+      secure: isProduction, // Secure cookie only in production
+    });
+
     res.json({ roles, accessToken, fullname });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("Login Error: ", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
