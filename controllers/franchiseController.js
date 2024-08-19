@@ -948,6 +948,35 @@ const cancelOR = async (req, res) => {
   }
 };
 
+const cashierCancelPending = async (req, res) => {
+  try {
+    const franchiseDetails = req.body;
+    if (!franchiseDetails)
+      return res
+        .status(400)
+        .json({ message: "Important franchise details are required." });
+
+    const foundFranchise = await Franchise.findOne({
+      MTOP: franchiseDetails.mtop,
+      isArchived: false,
+      pending: true,
+    });
+
+    if (foundFranchise) {
+      foundFranchise.pending = false;
+
+      await foundFranchise.save();
+    }
+
+    await PendingFranchise.findByIdAndDelete(franchiseDetails.id);
+
+    res.json({ message: "ok" });
+  } catch (err) {
+    console.error("Error fetching data:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getAllFranchise,
   getAllArchived,
@@ -961,4 +990,5 @@ module.exports = {
   pendingFranchisePayment,
   getFranchisePendingPaid,
   cancelOR,
+  cashierCancelPending,
 };
