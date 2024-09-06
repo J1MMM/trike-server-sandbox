@@ -582,7 +582,7 @@ const handleFranchiseUpdate = async (req, res) => {
 
       interest = surcharge2 * 0.1 * 12;
       if (months_1year_passed >= 1) {
-        interest += surcharge2 * 0.2 * months_1year_passed;
+        interest += surcharge2 * 0.2 * monthsPassed;
       }
 
       franchise *= 2;
