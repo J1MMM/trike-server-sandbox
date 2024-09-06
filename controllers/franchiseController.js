@@ -537,7 +537,6 @@ const handleFranchiseUpdate = async (req, res) => {
     //   },
     // ];
     // Get the current date and time
-    const dateNow = dayjs().tz("Asia/Kuala_Lumpur");
     let monthsPassed = undefined;
 
     // const franchiseTax = 110.0;
@@ -551,24 +550,39 @@ const handleFranchiseUpdate = async (req, res) => {
 
     const dateRenew = dayjs(franchiseDetails?.date).tz("Asia/Kuala_Lumpur");
     const lto_date = getRenewalDate(
-      franchiseDetails?.plateno,
+      foundFranchise?.plateno,
       foundFranchise?.DATE_RENEWAL
     );
     // Get the expiration date from foundFranchise (assuming DATE_EXPIRED is the property)
     const expirationDate = dayjs(lto_date).tz("Asia/Kuala_Lumpur");
+
+    const dateNow = dayjs().tz("Asia/Kuala_Lumpur"); // Current date in the specified timezone
+    const lastRenewalDate = dayjs(foundFranchise.DATE_RENEWAL).tz(
+      "Asia/Kuala_Lumpur"
+    ); // Last renewal date in the same timezone
+
+    // Extract only the year
+    const currentYear = dateNow.year();
+    const lastRenewalYear = lastRenewalDate.year(); //2021
 
     // Check if the expiration date is in the past
     if (expirationDate.isBefore(dateRenew)) {
       monthsPassed = dateRenew.diff(expirationDate, "month") + 1;
     }
 
-    if (monthsPassed < 12 && monthsPassed >= 1) {
+    if (lastRenewalYear + 1 == currentYear) {
       surcharge1 = mayors_permit * 0.5;
       surcharge2 = franchise * 0.25;
       interest = surcharge2 * 0.2 * monthsPassed;
     }
+    // console.log(currentYear);
+    // console.log(lastRenewalYear);
+    // console.log(lastRenewalYear - currentYear);
 
-    if (monthsPassed >= 12) {
+    if (
+      currentYear - lastRenewalYear >= 3 ||
+      lastRenewalYear + 2 == currentYear
+    ) {
       let months_1year_passed = monthsPassed - 12;
       mayors_permit *= 2;
       health *= 2;
@@ -581,6 +595,7 @@ const handleFranchiseUpdate = async (req, res) => {
       surcharge2 = franchise * 0.125;
 
       interest = surcharge2 * 0.1 * 12;
+
       if (months_1year_passed >= 1) {
         interest += surcharge2 * 0.2 * monthsPassed;
       }
