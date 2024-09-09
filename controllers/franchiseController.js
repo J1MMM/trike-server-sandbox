@@ -547,10 +547,11 @@ const handleFranchiseUpdate = async (req, res) => {
       _id: franchiseDetails.id,
       isArchived: false,
     });
+    // console.log(foundFranchise);
 
     const dateRenew = dayjs(franchiseDetails?.date).tz("Asia/Kuala_Lumpur");
     const lto_date = getRenewalDate(
-      foundFranchise?.plateno,
+      foundFranchise?.PLATE_NO,
       foundFranchise?.DATE_RENEWAL
     );
     // Get the expiration date from foundFranchise (assuming DATE_EXPIRED is the property)
@@ -564,11 +565,14 @@ const handleFranchiseUpdate = async (req, res) => {
     // Extract only the year
     const currentYear = dateNow.year();
     const lastRenewalYear = lastRenewalDate.year(); //2021
+    console.log(expirationDate.format());
+    console.log(dateRenewal.format());
 
     // Check if the expiration date is in the past
     if (expirationDate.isBefore(dateRenew)) {
       monthsPassed = dateRenew.diff(expirationDate, "month") + 1;
     }
+    console.log(monthsPassed);
 
     if (monthsPassed < 12 && monthsPassed >= 1) {
       surcharge1 = mayors_permit * 0.5;
