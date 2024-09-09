@@ -570,7 +570,7 @@ const handleFranchiseUpdate = async (req, res) => {
       monthsPassed = dateRenew.diff(expirationDate, "month") + 1;
     }
 
-    if (lastRenewalYear + 1 == currentYear) {
+    if (monthsPassed < 12 && monthsPassed >= 1) {
       surcharge1 = mayors_permit * 0.5;
       surcharge2 = franchise * 0.25;
       interest = surcharge2 * 0.2 * monthsPassed;
@@ -580,6 +580,7 @@ const handleFranchiseUpdate = async (req, res) => {
     // console.log(lastRenewalYear - currentYear);
 
     if (
+      //2025-2021 4 >= 3
       currentYear - lastRenewalYear >= 3 ||
       lastRenewalYear + 2 == currentYear
     ) {
