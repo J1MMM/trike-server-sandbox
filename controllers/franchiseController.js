@@ -551,7 +551,7 @@ const handleFranchiseUpdate = async (req, res) => {
 
     const dateRenew = dayjs(franchiseDetails?.date).tz("Asia/Kuala_Lumpur");
     const lto_date = getRenewalDate(
-      foundFranchise?.PLATE_NO,
+      franchiseDetails?.plateno,
       foundFranchise?.DATE_RENEWAL
     );
     // Get the expiration date from foundFranchise (assuming DATE_EXPIRED is the property)
