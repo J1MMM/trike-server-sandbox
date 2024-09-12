@@ -113,22 +113,30 @@ function getRenewalDate(plateNumber, lastRenewalDate = new Date()) {
 
 const getAllFranchise = async (req, res) => {
   try {
-    const rows = await Franchise.find({ isArchived: false }).sort({
-      MTOP: "asc",
-    });
+    // Get the current page and the number of records per page from the query parameters
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+    const pageSize = parseInt(req.query.pageSize) || 100; // Default to 100 records per page if not provided
 
-    // const updatedRows = rows.map((row) => {
-    //   const lto_date = getRenewalDate(row.PLATE_NO, row.DATE_RENEWAL);
+    // Calculate the number of records to skip
+    const skip = (page - 1) * pageSize;
 
-    //   row.LTO_RENEWAL_DATE = lto_date;
-    //   return row;
-    // });
+    // Fetch the data with pagination and sorting
+    const rows = await Franchise.find({ isArchived: false })
+      .sort({ MTOP: "asc" })
+      .skip(skip)
+      .limit(pageSize);
 
-    // await Promise.all(updatedRows.map((row) => row.save()));
-
+    // Count the total number of non-archived records
     const totalRows = await Franchise.countDocuments({ isArchived: false });
 
-    res.json({ rows, totalRows });
+    // Send the paginated data along with total record count
+
+    res.json({
+      rows,
+      totalRows,
+      currentPage: page,
+      totalPages: Math.ceil(totalRows / pageSize),
+    });
   } catch (err) {
     console.error("Error fetching data:", err);
     res.status(500).json({ message: "Internal server error" });
@@ -997,6 +1005,152 @@ const cashierCancelPending = async (req, res) => {
   }
 };
 
+const franchiseFilter = async (req, res) => {
+  try {
+    // Get pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 100;
+    const skip = (page - 1) * pageSize;
+
+    // Parse filter parameters
+    let filters = {};
+    try {
+      filters = JSON.parse(req.query.filters || "{}");
+    } catch (error) {
+      return res.status(400).json({ message: "Invalid filter format" });
+    }
+
+    // Initialize the query object
+    const filterQuery = { isArchived: false };
+
+    // Build the filter query from the parsed filters
+    if (filters.items && Array.isArray(filters.items)) {
+      filters.items.forEach((filter) => {
+        const { field, operator } = filter;
+        let value = filter.value.trim();
+        let formatedField = "";
+        // console.log(operator);
+        // console.log(field);
+        // console.log(value);
+
+        switch (field) {
+          case "mtop":
+            formatedField = "MTOP";
+            break;
+          case "lname":
+            formatedField = "LASTNAME";
+            break;
+          case "fname":
+            formatedField = "FIRSTNAME";
+            break;
+          case "mi":
+            formatedField = "MI";
+            break;
+          case "address":
+            formatedField = "ADDRESS";
+            break;
+          case "contact":
+            formatedField = "OWNER_NO";
+            break;
+          case "contact2":
+            formatedField = "DRIVERS_NO";
+            break;
+          case "toda":
+            formatedField = "TODA";
+            break;
+          case "drivername":
+            formatedField = "DRIVERS_NAME";
+            break;
+          case "driveraddress":
+            formatedField = "DRIVERS_ADDRESS";
+            break;
+          case "or":
+            formatedField = "OR";
+            break;
+          case "cr":
+            formatedField = "CR";
+            break;
+          case "driverlicenseno":
+            formatedField = "DRIVERS_LICENSE_NO";
+            break;
+          case "make":
+            formatedField = "MAKE";
+            break;
+          case "model":
+            formatedField = "MODEL";
+            break;
+          case "motorno":
+            formatedField = "MOTOR_NO";
+            break;
+          case "chassisno":
+            formatedField = "CHASSIS_NO";
+            break;
+          case "plateno":
+            formatedField = "PLATE_NO";
+            break;
+          case "stroke":
+            formatedField = "STROKE";
+            break;
+          case "remarks":
+            formatedField = "REMARKS";
+            break;
+          // case "date":
+          //   formatedField = "DATE_RENEWAL";
+          //   value = new Date(value)
+          //   break;
+        }
+
+        // console.log(formatedField);
+
+        switch (operator) {
+          case "contains":
+            filterQuery[formatedField] = {
+              $regex: new RegExp(value, "i"),
+            }; // Case-insensitive match
+            break;
+          case "equals":
+            filterQuery[formatedField] = value;
+            break;
+          case "startsWith":
+            filterQuery[formatedField] = {
+              $regex: new RegExp(`^${value}`, "i"),
+            };
+            break;
+          case "endsWith":
+            filterQuery[formatedField] = {
+              $regex: new RegExp(`${value}$`, "i"),
+            };
+            break;
+          // Add other operators as needed
+          default:
+            console.warn(`Unsupported operator: ${operator}`);
+        }
+      });
+    }
+    // console.log(filterQuery);
+
+    // Fetch the filtered data with pagination
+    const rows = await Franchise.find(filterQuery)
+      .sort({ MTOP: "asc" })
+      .skip(skip)
+      .limit(pageSize);
+
+    // Count the total number of records matching the filter query
+    const totalRows = await Franchise.countDocuments(filterQuery);
+
+    // Send the filtered data along with the total record count
+    res.json({
+      rows,
+      totalRows,
+      currentPage: page,
+      totalPages: Math.ceil(totalRows / pageSize),
+    });
+  } catch (err) {
+    console.error("Error fetching data:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getAllFranchise,
   getAllArchived,
@@ -1011,4 +1165,5 @@ module.exports = {
   getFranchisePendingPaid,
   cancelOR,
   cashierCancelPending,
+  franchiseFilter,
 };
