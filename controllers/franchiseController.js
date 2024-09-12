@@ -596,8 +596,8 @@ const handleFranchiseUpdate = async (req, res) => {
       filing *= 2;
       garbage *= 2;
 
-      surcharge1 = mayors_permit * 0.25;
-      surcharge2 = franchise * 0.125;
+      surcharge1 = mayors_permit * 0.5;
+      surcharge2 = franchise * 0.25;
 
       interest = surcharge2 * 0.1 * 12;
 
