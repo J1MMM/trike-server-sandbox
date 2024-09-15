@@ -1011,7 +1011,80 @@ const fetchFranchise = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 100;
     const skip = (page - 1) * pageSize;
+    const { sortDirection } = req.query;
+    let sortField = req.query.sortField;
 
+    switch (sortField) {
+      case "mtop":
+        sortField = "MTOP";
+        break;
+      case "lname":
+        sortField = "LASTNAME";
+        break;
+      case "fname":
+        sortField = "FIRSTNAME";
+        break;
+      case "mi":
+        sortField = "MI";
+        break;
+      case "address":
+        sortField = "ADDRESS";
+        break;
+      case "contact":
+        sortField = "OWNER_NO";
+        break;
+      case "contact2":
+        sortField = "DRIVERS_NO";
+        break;
+      case "toda":
+        sortField = "TODA";
+        break;
+      case "drivername":
+        sortField = "DRIVERS_NAME";
+        break;
+      case "driveraddress":
+        sortField = "DRIVERS_ADDRESS";
+        break;
+      case "or":
+        sortField = "OR";
+        break;
+      case "cr":
+        sortField = "CR";
+        break;
+      case "driverlicenseno":
+        sortField = "DRIVERS_LICENSE_NO";
+        break;
+      case "make":
+        sortField = "MAKE";
+        break;
+      case "model":
+        sortField = "MODEL";
+        break;
+      case "motorno":
+        sortField = "MOTOR_NO";
+        break;
+      case "chassisno":
+        sortField = "CHASSIS_NO";
+        break;
+      case "plateno":
+        sortField = "PLATE_NO";
+        break;
+      case "stroke":
+        sortField = "STROKE";
+        break;
+      case "remarks":
+        sortField = "REMARKS";
+        break;
+      case "date":
+        sortField = "DATE_RENEWAL";
+        break;
+    }
+
+    const sort = {};
+    if (sortField) {
+      sort[sortField] = sortDirection === "asc" ? 1 : -1;
+    }
+    // console.log(sort);
     // Parse filter parameters
     let filters = {};
     try {
@@ -1027,14 +1100,12 @@ const fetchFranchise = async (req, res) => {
     if (filters.items && Array.isArray(filters.items)) {
       filters.items.forEach((filter) => {
         const { field, operator } = filter;
-        let value = "";
-        if (filter.value != undefined) {
-          value = filter.value.trim();
-        }
+        let value = filter.value ? filter.value.trim() : "";
+
         let formatedField = "";
         // console.log(operator);
         // console.log(field);
-        // console.log(value);
+        console.log(value);
 
         switch (field) {
           case "mtop":
@@ -1134,7 +1205,7 @@ const fetchFranchise = async (req, res) => {
 
     // Fetch the filtered data with pagination
     const rows = await Franchise.find(filterQuery)
-      .sort({ MTOP: "asc" })
+      .sort(sort)
       .skip(skip)
       .limit(pageSize);
 
