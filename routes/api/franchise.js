@@ -14,12 +14,12 @@ const {
   getFranchisePendingPaid,
   cancelOR,
   cashierCancelPending,
-  franchiseFilter,
+  fetchFranchise,
 } = require("../../controllers/franchiseController");
 
 router
   .route("/")
-  .get(getAllFranchise)
+  .get(fetchFranchise)
   .patch(archiveFranchise)
   .post(addNewFranchise);
 router.route("/archive").get(getAllArchived);
@@ -32,6 +32,6 @@ router.route("/pending").get(getFranchisePending).post(pendingFranchisePayment);
 router.route("/cancel").post(cancelOR);
 router.route("/cashier-cancel-pending").post(cashierCancelPending);
 router.route("/paid").get(getFranchisePendingPaid);
-router.route("/filter").get(franchiseFilter);
+// router.route("/filter").get(franchiseFilter);
 
 module.exports = router;

@@ -1005,7 +1005,7 @@ const cashierCancelPending = async (req, res) => {
   }
 };
 
-const franchiseFilter = async (req, res) => {
+const fetchFranchise = async (req, res) => {
   try {
     // Get pagination parameters
     const page = parseInt(req.query.page) || 1;
@@ -1027,7 +1027,10 @@ const franchiseFilter = async (req, res) => {
     if (filters.items && Array.isArray(filters.items)) {
       filters.items.forEach((filter) => {
         const { field, operator } = filter;
-        let value = filter.value.trim();
+        let value = "";
+        if (filter.value != undefined) {
+          value = filter.value.trim();
+        }
         let formatedField = "";
         // console.log(operator);
         // console.log(field);
@@ -1165,5 +1168,5 @@ module.exports = {
   getFranchisePendingPaid,
   cancelOR,
   cashierCancelPending,
-  franchiseFilter,
+  fetchFranchise,
 };
