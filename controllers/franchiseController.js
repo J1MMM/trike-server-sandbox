@@ -181,18 +181,18 @@ const getAllAvailableMTOPs = async (req, res) => {
     // Find all available MTOP numbers that are currently assigned to franchises
     const usedFranchises = await Franchise.find({
       isArchived: false,
-      MTOP: { $gte: 0, $lte: 7500 },
+      MTOP: { $gte: 0, $lte: 8500 },
     }).distinct("MTOP");
 
     const mtopInPending = await PendingFranchise.find({
       isArchived: false,
-      MTOP: { $gte: 0, $lte: 7500 },
+      MTOP: { $gte: 0, $lte: 8500 },
     }).distinct("MTOP");
 
     const allUsedMtop = [...mtopInPending, ...usedFranchises];
 
-    // Generate an array containing all MTOP numbers from 0001 to 7500
-    const allMTOPs = Array.from({ length: 7500 }, (_, index) =>
+    // Generate an array containing all MTOP numbers from 0001 to 8500
+    const allMTOPs = Array.from({ length: 8500 }, (_, index) =>
       String(index + 1).padStart(4, "0")
     );
 
