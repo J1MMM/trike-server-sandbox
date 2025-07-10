@@ -10,7 +10,11 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const computeTotalPrice = (array) => {
-  return array.reduce((total, obj) => total + obj?.price, 0);
+  let latot = 0;
+  array?.map((obj) => {
+    latot += parseInt(obj.count) * parseInt(obj.price);
+  });
+  return latot;
 };
 
 function removeOneItemPerMatch(array1, array2) {
@@ -26,18 +30,6 @@ function removeOneItemPerMatch(array1, array2) {
 
   // Return the modified array2
   return array2;
-}
-
-function arraysEqual(arr1, arr2) {
-  if (arr1.length !== arr2.length) {
-    return false;
-  }
-  for (let i = 0; i < arr1.length; i++) {
-    if (arr1[i] !== arr2[i]) {
-      return false;
-    }
-  }
-  return true;
 }
 
 const getViolationList = async (req, res) => {
@@ -78,31 +70,17 @@ const addViolator = async (req, res) => {
       }
     );
 
-    if (violationDetails.franchiseNo) {
+    const foundFranchise = await Franchise.findOne({
+      MTOP: violationDetails.franchiseNo,
+      isArchived: false,
+    });
+
+    if (violationDetails.franchiseNo && foundFranchise) {
       let violations = violationDetails.violation.map((obj) => obj.violation);
 
-      const foundFranchise = await Franchise.findOne({
-        MTOP: violationDetails.franchiseNo,
-        isArchived: false,
-      });
-
-      if (foundFranchise) {
-        const containsOthers = violations.find((v) => v == "OTHERS");
-
-        if (containsOthers) {
-          violations = violations.map((violation) => {
-            if (violation == "OTHERS") {
-              return `${violationDetails.others} (OTHERS)` || "OTHERS";
-            } else {
-              return violation;
-            }
-          });
-        }
-
-        const allViolations = [...foundFranchise.COMPLAINT, ...violations];
-        foundFranchise.COMPLAINT = allViolations;
-        foundFranchise.save();
-      }
+      const allViolations = [...foundFranchise.COMPLAINT, ...violations];
+      foundFranchise.COMPLAINT = allViolations;
+      foundFranchise.save();
     }
 
     res.status(201).json(newViolator);
@@ -175,7 +153,7 @@ const updateViolation = async (req, res) => {
     }
 
     //check if franchises exist sometimes it already on archive
-    if (violationDetails?.franchiseNo) {
+    if (violationDetails?.franchiseNo && prevFranchise) {
       // if franchise number is exist
       if (prevViolationDetails.franchiseNo) {
         // if the franchise number of prev violation details is exist
@@ -252,20 +230,6 @@ const updateViolationPaidStatus = async (req, res) => {
     if (violationDetails.franchiseNo) {
       let violations = violationDetails.violation?.map((obj) => obj.violation);
 
-      if (violations?.length > 0) {
-        const containsOthers = violations.find((v) => v == "OTHERS");
-
-        if (containsOthers) {
-          violations = violations.map((violation) => {
-            if (violation == "OTHERS") {
-              return `${violationDetails.others} (OTHERS)` || "OTHERS";
-            } else {
-              return violation;
-            }
-          });
-        }
-      }
-
       const foundFranchise = await Franchise.findOne({
         MTOP: violationDetails.franchiseNo,
         isArchived: false,
@@ -279,6 +243,7 @@ const updateViolationPaidStatus = async (req, res) => {
         await foundFranchise.save();
       }
     }
+
     const updatedViolation = await Violation.findOneAndUpdate(
       { _id: violationDetails._id, paid: false },
       {
@@ -297,6 +262,7 @@ const updateViolationPaidStatus = async (req, res) => {
     if (!updatedViolation) return res.sendStatus(400);
     res.sendStatus(201);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: error.message });
   }
 };
